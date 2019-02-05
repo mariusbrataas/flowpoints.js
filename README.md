@@ -23,7 +23,7 @@ import { Flowpoint, Flowspace } from 'flowpoints';
       ...
     </div>
   </Flowpoint>
-  <Flowpoint id={"point_b"}>
+  <Flowpoint key={"point_b"}>
     <div>
       I am point b
       ...
