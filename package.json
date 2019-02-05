@@ -1,19 +1,35 @@
 {
   "name": "flowpoints",
   "version": "1.0.0",
-  "description": "",
+  "description": "A developer-friendly library for creating flowcharts and diagrams.",
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack-dev-server --mode development",
     "transpile": "babel src -d dist",
-    "prepublishOnly": "npm run transpile",
+    "prepublishOnly": "npm run transpile && npm run build && npm run deploy && clear",
     "build": "webpack --mode production",
     "deploy": "gh-pages -d demo/dist",
     "publish-demo": "npm run build && npm run deploy"
   },
-  "author": "",
+  "author": "Marius Brataas",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/mariusbrataas/flowpoints.git"
+  },
+  "keywords": [
+    "react",
+    "draggable",
+    "react-component",
+    "diagram",
+    "flowchart",
+    "javascript"
+  ],
+  "bugs": {
+    "url": "https://github.com/mariusbrataas/flowpoints/issues"
+  },
+  "homepage": "https://github.com/mariusbrataas/flowpoints",
   "peerDependencies": {
     "react": "^16.3.0",
     "react-dom": "^16.3.0"
