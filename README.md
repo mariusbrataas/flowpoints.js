@@ -3,7 +3,7 @@
 # Flowpoints
 A developer-friendly library for creating flowcharts and diagrams.
 
-Simple demo [here!](https://mariusbrataas.github.io/flowpoints/?p=#00fff2_#0c00ff_4_3_0&Click%s0me%s0once&6&5&_1&Click%s0me%s0too&6&i&_2&Watch%s0the%s0magic&6&v&)
+Simple demo [here](https://mariusbrataas.github.io/flowpoints/?p=#00fff2_#0c00ff_4_3_0&Click%s0me%s0once&6&5&_1&Click%s0me%s0too&6&i&_2&Watch%s0the%s0magic&6&v&) and cooler demo [here](https://mariusbrataas.github.io/flowpoints/?p=#41e2f4_#4164f4_4_10_0&This&7&9&1,rl_1&is&y&9&2,rl#3,bt_2&Flowpoints!&1j&9&_3&a&k&k&4,rt_4&library&u&r&5,rt_5&for&14&y&6,rt_6&creating&1e&15&7,rt#8,rl#9,rb_7&flowcharts&1y&v&_8&and&1y&15&_9&diagrams&1y&1f&)
 
 
 ## Installation
@@ -157,7 +157,7 @@ ReactDOM.render(<App />, document.getElementById('root'))
 
 Of course, you can do with much less code than this, but this example should give a good indication on how you can structure your data for a flowchart.
 
-Check out the [demo](https://mariusbrataas.github.io/flowpoints/?p=#41e2f4_#4164f4_4_10_0&This&a&9&1,rl_1&is&y&9&2,rl#3,bt_2&Flowpoints!&1i&9&_3&a&k&k&4,rt_4&library&u&r&5,rt_5&for&14&y&6,rt_6&creating&1e&15&7,rt#8,rl#9,rb_7&flowcharts&1y&v&_8&and&1y&15&_9&diagrams&1y&1f&) and it's [source code](https://github.com/mariusbrataas/flowpoints/demo) for more.
+Check out the [demo](https://mariusbrataas.github.io/flowpoints/?p=#41e2f4_#4164f4_4_10_0&This&a&9&1,rl_1&is&y&9&2,rl#3,bt_2&Flowpoints!&1i&9&_3&a&k&k&4,rt_4&library&u&r&5,rt_5&for&14&y&6,rt_6&creating&1e&15&7,rt#8,rl#9,rb_7&flowcharts&1y&v&_8&and&1y&15&_9&diagrams&1y&1f&) and it's [source code](https://github.com/mariusbrataas/flowpoints/tree/master/demo/src) for more.
 
 
 ## Contributing to this project
