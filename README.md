@@ -25,7 +25,7 @@ import { Flowpoint, Flowspace } from 'flowpoints';
       ...
     </div>
   </Flowpoint>
-  <Flowpoint id={"point_b"}>
+  <Flowpoint key={"point_b"}>
     <div>
       I am point b
       ...
@@ -69,11 +69,11 @@ Create an object using the following pattern:
   }}>Hello World!</Flowpoint>
 ...
 ```
-
+ 
  The "right" and "left" arguments tell the flowspace where on the involved flowpoints the connections should attach.
-
+ 
  Available values (defaults to center):
-
+ 
  * top
  * left
  * center
@@ -94,11 +94,11 @@ Class App extends Component {
 
   constructor(props) {
     super(props);
-
+    
     this.state = {
-
+    
       selected_point: null,
-
+      
       flowpoints: {
         "a": {
           position: { x:50, y:50 },
@@ -116,7 +116,7 @@ Class App extends Component {
       }
     }
   }
-
+  
   render() {
     return (
       <Flowspace
@@ -158,3 +158,32 @@ ReactDOM.render(<App />, document.getElementById('root'))
 Of course, you can do with much less code than this, but this example should give a good indication on how you can structure your data for a flowchart.
 
 Check out the [demo](https://mariusbrataas.github.io/flowpoints/?p=#41e2f4_#4164f4_4_10_0&This&a&9&1,rl_1&is&y&9&2,rl#3,bt_2&Flowpoints!&1i&9&_3&a&k&k&4,rt_4&library&u&r&5,rt_5&for&14&y&6,rt_6&creating&1e&15&7,rt#8,rl#9,rb_7&flowcharts&1y&v&_8&and&1y&15&_9&diagrams&1y&1f&) and it's [source code](https://github.com/mariusbrataas/flowpoints/demo) for more.
+
+
+## Contributing to this project
+
+### Directory structure
+```
+flowpoints
+├── .gitattributes
+├── .gitignore
+├── LICENSE
+├── package-lock.json
+├── package.json
+├── README.md
+│
+├── assets
+│   ├── favicon.ico
+│   └── this_is_flowpoints.png
+│
+├── demo
+│   ├── src
+│   ├── index.css
+│   ├── index.html
+│   └── index.js
+│
+└── src
+    ├── Flowpoint.js
+    ├── Flowspace.js
+    └── index.js
+```
