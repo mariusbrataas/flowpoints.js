@@ -3,6 +3,8 @@
 # Flowpoints
 A developer-friendly library for creating flowcharts and diagrams.
 
+Simple demo [here!](https://mariusbrataas.github.io/flowpoints/?p=#00fff2_#0c00ff_4_3_0&Click%s0me%s0once&6&5&_1&Click%s0me%s0too&6&i&_2&Watch%s0the%s0magic&6&v&)
+
 
 ## Installation
 ```‌
@@ -11,24 +13,24 @@ npm install --save flowpoints
 
 
 ## Usage
-```js
+```javascript
 import React from 'react';
 import { Flowpoint, Flowspace } from 'flowpoints';
 
 ...
 <Flowspace>
-  <Flowpoint key={"point_a"} outputs={["point_b"]}>
-    <div>
-      Hello world
-      ...
-    </div>
-  </Flowpoint>
-  <Flowpoint key={"point_b"}>
-    <div>
-      I am point b
-      ...
-    </div>
-  </Flowpoint>
+	<Flowpoint key={"point_a"} outputs={["point_b"]}>
+		<div>
+			Hello world
+			...
+		</div>
+	</Flowpoint>
+	<Flowpoint id={"point_b"}>
+		<div>
+			I am point b
+			...
+		</div>
+	</Flowpoint>
 </Flowspace>
 ...
 ```
@@ -51,20 +53,20 @@ Simply pass an array with the keys to all the flowpoints the current one should 
 __As an object.__\
 Create an object using the following pattern:
 
-```js
+```javascript
 ...
 <Flowpoint
-  key="point_a"
-  outputs={{
-    "point_b": {
-      output: "right",
-      input: "left"
-    },
-    "point_c": {
-      output: "right",
-      input: "left"
-    }
-  }}>Hello World!</Flowpoint>
+	key="point_a"
+	outputs={{
+		"point_b": {
+			output: "right",
+			input: "left"
+		},
+		"point_c": {
+			output: "right",
+			input: "left"
+		}
+	}}>Hello World!</Flowpoint>
 ...
 ```
 
@@ -82,7 +84,7 @@ Create an object using the following pattern:
 ## Recommended pattern
 Once a flowpoint unmounts it will forget it's last position. To help with this (and a few more things) I find that the following pattern works really well:
 
-```js
+```javascript
 import React, { Component } from 'react';
 import ReactDOM from "react-dom";
 import { Flowpoint, Flowspace } from 'flowpoints';
@@ -90,64 +92,64 @@ import { Flowpoint, Flowspace } from 'flowpoints';
 
 Class App extends Component {
 
-  constructor(props) {
-    super(props);
+	constructor(props) {
+		super(props);
 
-    this.state = {
+		this.state = {
 
-      selected_point: null,
+			selected_point: null,
 
-      flowpoints: {
-        "a": {
-          position: { x:50, y:50 },
-          outputs: {
-            "b": {
-              output:"right",
-              input:"left",
-              outputColor:"blue",
-              inputColor:"white",
-              width:3,
-              onClick={(key_a, key_b) => { ... }}
-            }
-          }
-        }
-      }
-    }
-  }
+			flowpoints: {
+				"a": {
+					position: { x:50, y:50 },
+					outputs: {
+						"b": {
+							output:"right",
+							input:"left",
+							outputColor:"blue",
+							inputColor:"white",
+							width:3,
+							onClick={(key_a, key_b) => { ... }}
+						}
+					}
+				}
+			}
+		}
+	}
 
-  render() {
-    return (
-      <Flowspace
-        style={{ height:"100vh", width:"100vw" }}
-        selected={this.state.selected_point}>
-        {
-          Object.keys(this.state.flowpoints).map(key => {
-            const point = this.state.flowpoints[key]
-            return (
-              <Flowpoint
-                key={key}
-                snap={ x:10, y:10 }
-                startPosition={point.pos}
-                onClick={() => {
-                  var selected_point = this.state.selected_point
-                  if (selected_point === key) {
-                    selected_point = null
-                  } else {
-                    selected_point = key
-                  }
-                  this.setState({selected_point})
-                }}
-                onDrag={position => {
-                  var flowpoints = this.state.flowpoints
-                  flowpoints[key].position = position
-                  this.setState({flowpoints})
-                }}>{"Hello from " + key}</Flowpoint>
-            )
-          })
-        }
-      </Flowspace>
-    )
-  }
+	render() {
+		return (
+			<Flowspace
+				style={{ height:"100vh", width:"100vw" }}
+				selected={this.state.selected_point}>
+				{
+					Object.keys(this.state.flowpoints).map(key => {
+						const point = this.state.flowpoints[key]
+						return (
+							<Flowpoint
+								key={key}
+								snap={ x:10, y:10 }
+								startPosition={point.pos}
+								onClick={() => {
+									var selected_point = this.state.selected_point
+									if (selected_point === key) {
+										selected_point = null
+									} else {
+										selected_point = key
+									}
+									this.setState({selected_point})
+								}}
+								onDrag={position => {
+									var flowpoints = this.state.flowpoints
+									flowpoints[key].position = position
+									this.setState({flowpoints})
+								}}>{"Hello from " + key}</Flowpoint>
+						)
+					})
+				}
+			</Flowspace>
+		)
+	}
 }
 
 ReactDOM.render(<App />, document.getElementById('root'))
