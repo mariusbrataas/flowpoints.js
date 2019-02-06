@@ -41,20 +41,8 @@ export default class Flowpoint extends Component {
 
       // Position and relative position
       pos: (props.startPosition === undefined) ? {x:0, y:0} : props.startPosition,
-      rel: {x:0, y:0},
+      rel: {x:0, y:0}
 
-      // Connection width
-      lineWidth: (props.lineWidth === undefined) ? 3 : props.lineWidth,
-
-      // Connection locations
-      inputPosX: (props.inputPosX === undefined) ? 'left' : props.inputPosX,
-      inputPosY: (props.inputPosY === undefined) ? 'center' : props.inputPosY,
-      outputPosX: (props.outputPosX === undefined) ? 'right' : props.outputPosX,
-      outputPosY: (props.outputPosY === undefined) ? 'center' : props.outputPosY,
-
-      // Connections
-      inputs: (props.inputs === undefined) ? [] : props.inputs,
-      outputs: (props.outputs === undefined) ? [] : props.outputs
     };
 
     // Helper variables
@@ -69,10 +57,10 @@ export default class Flowpoint extends Component {
     // Refered methods
     this.updateFlowspace = props.updateFlowspace;
 
-    // Helper methods
+    // Binding helper methods
     this.tellFlowspace = this.tellFlowspace.bind(this);
 
-    // Binding class methods
+    // Binding event handlers
     this.onMouseOver = this.onMouseOver.bind(this);
     this.onMouseOut = this.onMouseOut.bind(this);
     this.onMouseDown = this.onMouseDown.bind(this);
@@ -185,15 +173,14 @@ export default class Flowpoint extends Component {
     this.didDrag = true;
 
     // Calculating new position
-    this.setState({
-      pos: {
-        x: this.state.dragX ? CalcPos(e.touches[0].pageX - this.state.rel.x, this.state.snap.x, this.state.minX) : this.state.pos.x,
-        y: this.state.dragY ? CalcPos(e.touches[0].pageY - this.state.rel.y, this.state.snap.y, this.state.minY) : this.state.pos.y
-      }
-    })
+    var pos = {
+      x: this.state.dragX ? CalcPos(e.touches[0].pageX - this.state.rel.x, this.state.snap.x, this.state.minX) : this.state.pos.x,
+      y: this.state.dragY ? CalcPos(e.touches[0].pageY - this.state.rel.y, this.state.snap.y, this.state.minY) : this.state.pos.y
+    };
+    this.setState({pos})
 
     // Passing to user-defined event handler
-    if (this.onDrag !== undefined) {this.onDrag(e)}
+    if (this.onDrag) this.onDrag(pos)
 
     // Updating flowspace
     this.tellFlowspace()

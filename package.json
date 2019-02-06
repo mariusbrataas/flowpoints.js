@@ -1,13 +1,13 @@
 {
   "name": "flowpoints",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "A developer-friendly library for creating flowcharts and diagrams.",
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "webpack-dev-server --mode development",
     "transpile": "babel src -d dist",
-    "prepublishOnly": "clear && npm run transpile && clear && npm run build && clear && npm run deploy && clear",
+    "prepublishOnly": "npm run transpile && npm run build && npm run deploy",
     "build": "webpack --mode production",
     "deploy": "gh-pages -d demo/dist",
     "publish-demo": "npm run build && npm run deploy"
