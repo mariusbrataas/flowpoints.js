@@ -120,8 +120,7 @@ export default class Flowpoint extends Component {
         x: this.state.pos.x,
         y: this.state.pos.y,
         width: this.state.width,
-        height: this.state.height,
-        didUpdate: true
+        height: this.state.height
       }
     )
 
@@ -162,6 +161,9 @@ export default class Flowpoint extends Component {
 
     // Resetting drag
     this.setState({drag: false})
+
+    // Updating flowspace
+    this.tellFlowspace()
 
     // Final routines
     e.stopPropagation()
@@ -246,6 +248,9 @@ export default class Flowpoint extends Component {
 
     // Resetting drag
     this.setState({drag: false})
+
+    // Updating flowspace
+    this.tellFlowspace()
 
     // Final routines
     e.stopPropagation()

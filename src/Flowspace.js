@@ -55,7 +55,7 @@ function AutoGetLoc(pa, pb, aLoc, bLoc) {
       const p1 = GetConnectorLoc(pa, posA);
       positions.map(posB => {
         const p2 = GetConnectorLoc(pb, posB);
-        const d = Math.pow(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2), 0.5) / 2;
+        const d = Math.pow(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2), 0.5);
         if (d < best.d) {
           best.d = d;
           best.output = p1;
@@ -83,8 +83,8 @@ export default class Flowspace extends Component {
     this.state = {};
 
     // Helper variables
-    this.updates = {};
-    this.prevPositions = {}; // To help preventing unnecessary calculations
+    this.updated = {};
+    this.positions = {}; // To help preventing unnecessary calculations
     this.didMount = false; // Used to determine when drawing of connections should start
 
     // Binding class methods
@@ -94,7 +94,7 @@ export default class Flowspace extends Component {
 
 
   updateFlowspace(key, pos) {
-    this.updates[key] = true;
+    this.updated[key] = true;
     this.setState({[key]: pos});
   }
 
@@ -183,23 +183,28 @@ export default class Flowspace extends Component {
         maxY = Math.max(maxY, point.y + 2 * point.height)
       })
 
-      // Settings
-      const base_offset = 100
-
       // Looping through connections and adding paths and gradients.
+      var newCons = [];
       connections.map(connection => {
 
         // Loop specifics
         const pa = this.state[connection.a]
         const pb = this.state[connection.b]
+        const con_key = connection.a + '_' + connection.b;
 
-        const grad_name = 'grad_' + connection.a + '_' + connection.b
+        const grad_name = 'grad_' + con_key;
+
+        // Adding to this cycle's connections
+        newCons.push(con_key)
 
         // Continuing only if both pa and pb are defined
         if (pa && pb) {
 
           // Calculate new positions or get old ones
-          var positions = AutoGetLoc(pa, pb, connection.outputLoc, connection.inputLoc);
+          if (this.updated[connection.a] || this.updated[connection.b]) {
+            this.positions[con_key] = AutoGetLoc(pa, pb, connection.outputLoc, connection.inputLoc);
+          }
+          var positions = this.positions[con_key];
 
           // Calculating bezier offsets and adding new path to list
           const d = Math.round(Math.pow(Math.pow(positions.output.x - positions.input.x, 2) + Math.pow(positions.output.y - positions.input.y, 2), 0.5) / 2)
@@ -212,7 +217,7 @@ export default class Flowspace extends Component {
             <path
               key={pathkey}
               className='flowconnection'
-              style={{ transition:'stroke-width 0.15s ease-in-out' }}
+              style={{ transition:'stroke-width 0.15s ease-in-out'}}
               d={'M' + positions.output.x + ',' + positions.output.y +
                 'C' +
                 (positions.output.x + (positions.output.offsetX > 0 ? Math.min(d, positions.output.offsetX) : Math.max(-d, positions.output.offsetX))) + ',' +
@@ -260,6 +265,13 @@ export default class Flowspace extends Component {
           )
         }
       })
+
+      // Prevent more calculations than necessary
+      Object.keys(this.updated).map(testkey => {
+        this.updated[testkey] = false
+        if (!newCons.includes(testkey)) delete this.updated[testkey];
+      })
+
     }
 
     // Adding scroll (settings for overflow will be overwritten if defined by user)

@@ -70,6 +70,7 @@ function parseFromQuery(rawquery) {
       const output_q = output_str.split(',')
       if (output_q.length === 2) {
         const let2pos = {
+          a: 'auto',
           t: 'top',
           l: 'left',
           c: 'center',
