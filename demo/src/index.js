@@ -340,7 +340,7 @@ class App extends Component {
               return (
                 <Flowpoint
                   key={key}
-                  snap={{x:1, y:1}}
+                  snap={{x:10, y:10}}
                   startPosition={point.pos}
                   outputs={point.outputs}
                   onClick={() => {this.handleClick(key)}}

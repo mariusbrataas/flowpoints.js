@@ -138,7 +138,7 @@ import ReactDOM from "react-dom";
 import { Flowpoint, Flowspace } from 'flowpoints';
 
 
-Class App extends Component {
+class App extends Component {
 
   constructor(props) {
     super(props);
