@@ -192,8 +192,8 @@ class App extends Component {
           delete p1.outputs[id]
         } else {
           p1.outputs[id] = {
-            output:'right',
-            input:'left',
+            output:'auto',
+            input:'auto',
             onClick:this.handleClickLine
           }
         }
@@ -297,7 +297,7 @@ class App extends Component {
                     <div>
                       <h4 style={{marginTop:'5px', marginBottom:'2px'}}>{dir_key + ' position'}</h4>
                       {
-                        ['top', 'left', 'center', 'right', 'bottom'].map(pos_key => {
+                        ['auto', 'top', 'left', 'center', 'right', 'bottom'].map(pos_key => {
                           return (
                             <button
                               style={{marginTop:'2px'}}
@@ -339,7 +339,7 @@ class App extends Component {
               return (
                 <Flowpoint
                   key={key}
-                  snap={{x:10, y:10}}
+                  snap={{x:1, y:1}}
                   startPosition={point.pos}
                   outputs={point.outputs}
                   onClick={() => {this.handleClick(key)}}

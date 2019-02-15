@@ -2,6 +2,77 @@ import React, { Component } from 'react';
 import Flowpoint from './Flowpoint.js';
 
 
+// Get connector location
+function GetConnectorLoc(p, loc) {
+  const base_offset = 100;
+  var location = {
+    x: p.x,
+    y: p.y,
+    offsetX: 0,
+    offsetY: 0
+  };
+  switch(loc[0]) {
+    case 't':
+      location.x += Math.round( p.width / 2 );
+      location.offsetY = -base_offset;
+      break;
+    case 'l':
+      location.y += Math.round( p.height / 2 );
+      location.offsetX = -base_offset;
+      break;
+    case 'r':
+      location.x += p.width;
+      location.y += Math.round( p.height / 2 );
+      location.offsetX = base_offset;
+      break;
+    case 'b':
+      location.x += Math.round( p.width / 2 );
+      location.y += p.height
+      location.offsetY = base_offset;
+      break;
+    default:
+      location.x += Math.round( p.width / 2 );
+      location.y += Math.round( p.height / 2 );
+  }
+  return location
+}
+
+
+// Auto connector locations
+function AutoGetLoc(pa, pb, aLoc, bLoc) {
+  var newLocs = {
+    output: null,
+    input: null
+  }
+  if (aLoc === 'auto' || bLoc === 'auto') {
+    const positions = ['top','left','right','bottom'];
+    var best = {
+      d: Infinity,
+      output: null,
+      input: null
+    };
+    positions.map(posA => {
+      const p1 = GetConnectorLoc(pa, posA);
+      positions.map(posB => {
+        const p2 = GetConnectorLoc(pb, posB);
+        const d = Math.pow(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2), 0.5) / 2;
+        if (d < best.d) {
+          best.d = d;
+          best.output = p1;
+          best.input = p2;
+        }
+      })
+    })
+    newLocs.output = aLoc === 'auto' ? best.output : GetConnectorLoc(pa, aLoc);
+    newLocs.input = bLoc === 'auto' ? best.input : GetConnectorLoc(pb, bLoc);
+  } else {
+    newLocs.output = GetConnectorLoc(pa, aLoc);
+    newLocs.input = GetConnectorLoc(pb, bLoc);
+  }
+  return newLocs
+}
+
+
 // Component class
 export default class Flowspace extends Component {
 
@@ -12,6 +83,8 @@ export default class Flowspace extends Component {
     this.state = {};
 
     // Helper variables
+    this.updates = {};
+    this.prevPositions = {}; // To help preventing unnecessary calculations
     this.didMount = false; // Used to determine when drawing of connections should start
 
     // Binding class methods
@@ -21,6 +94,7 @@ export default class Flowspace extends Component {
 
 
   updateFlowspace(key, pos) {
+    this.updates[key] = true;
     this.setState({[key]: pos});
   }
 
@@ -54,9 +128,9 @@ export default class Flowspace extends Component {
             connections.push({
               a:child.key,
               b:out_key,
-              width: this.props.connectionSize || 3,
-              outputLoc: 'center',
-              inputLoc: 'center',
+              width: this.props.connectionSize || 4,
+              outputLoc: 'auto',
+              inputLoc: 'auto',
               outputColor: this.props.outputColor || '#0c00ff',
               inputColor: this.props.inputColor || '#00fff2',
               onClick: null
@@ -70,9 +144,9 @@ export default class Flowspace extends Component {
             connections.push({
               a:child.key,
               b:out_key,
-              width: output.width || this.props.connectionSize || 3,
-              outputLoc: output.output || 'center',
-              inputLoc: output.input || 'center',
+              width: output.width || this.props.connectionSize || 4,
+              outputLoc: output.output || 'auto',
+              inputLoc: output.input || 'auto',
               outputColor: output.outputColor || this.props.outputColor || '#0c00ff',
               inputColor: output.inputColor || this.props.inputColor || '#00fff2',
               onClick: output.onClick ? (e) => {output.onClick(child.key, out_key, e)} : this.props.onLineClick ? (e) => {this.props.onLineClick(child.key, out_key, e)} : null
@@ -124,61 +198,8 @@ export default class Flowspace extends Component {
         // Continuing only if both pa and pb are defined
         if (pa && pb) {
 
-          // Prepping connection locations
-          var positions = {
-            output: { x:pa.x, y:pa.y, offsetX:0, offsetY:0 },
-            input: { x:pb.x, y:pb.y, offsetX:0, offsetY:0 }
-          }
-
-          // Adjusting output position
-          switch(connection.outputLoc[0]) {
-            case 't':
-              positions.output.x += Math.round( pa.width / 2 );
-              positions.output.offsetY = -base_offset;
-              break;
-            case 'l':
-              positions.output.y += Math.round( pa.height / 2 );
-              positions.output.offsetX = -base_offset;
-              break;
-            case 'r':
-              positions.output.x += pa.width;
-              positions.output.y += Math.round( pa.height / 2 );
-              positions.output.offsetX = base_offset;
-              break;
-            case 'b':
-              positions.output.x += Math.round( pa.width / 2 );
-              positions.output.y += pa.height
-              positions.output.offsetY = base_offset;
-              break;
-            default:
-              positions.output.x += Math.round( pa.width / 2 );
-              positions.output.y += Math.round( pa.height / 2 );
-          }
-
-          // Adjusting input position
-          switch(connection.inputLoc[0]) {
-            case 't':
-              positions.input.x += Math.round( pb.width / 2 );
-              positions.input.offsetY = -base_offset;
-              break;
-            case 'l':
-              positions.input.y += Math.round( pb.height / 2 );
-              positions.input.offsetX = -base_offset;
-              break;
-            case 'r':
-              positions.input.x += pb.width;
-              positions.input.y += Math.round( pb.height / 2 );
-              positions.input.offsetX = base_offset;
-              break;
-            case 'b':
-              positions.input.x += Math.round( pb.width / 2 );
-              positions.input.y += pb.height
-              positions.input.offsetY = base_offset;
-              break;
-            default:
-              positions.input.x += Math.round( pb.width / 2 );
-              positions.input.y += Math.round( pb.height / 2 );
-          }
+          // Calculate new positions or get old ones
+          var positions = AutoGetLoc(pa, pb, connection.outputLoc, connection.inputLoc);
 
           // Calculating bezier offsets and adding new path to list
           const d = Math.round(Math.pow(Math.pow(positions.output.x - positions.input.x, 2) + Math.pow(positions.output.y - positions.input.y, 2), 0.5) / 2)
@@ -208,7 +229,7 @@ export default class Flowspace extends Component {
           // Calculating how x and y should affect gradient
           var p1 = {x:0, y:0}
           var p2 = {x:0, y:0}
-          const maxD = Math.max(Math.abs(positions.output.x - positions.input.x), Math.abs(positions.output.y - positions.input.y))
+          const maxD = Math.max(Math.abs(positions.output.x - positions.input.x), Math.abs(positions.output.y - positions.input.y)) + 1e-5;
           if (Math.abs(positions.output.x - positions.input.x) > Math.abs(positions.output.y - positions.input.y)) {
             if (positions.output.x > positions.input.x) {
               p1.x = maxD;

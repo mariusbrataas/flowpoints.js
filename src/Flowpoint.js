@@ -112,6 +112,7 @@ export default class Flowpoint extends Component {
 
 
   tellFlowspace() {
+
     // Telling parent flowspace about new positions and/or dimensions
     this.updateFlowspace(
       this.state.id,
@@ -119,9 +120,14 @@ export default class Flowpoint extends Component {
         x: this.state.pos.x,
         y: this.state.pos.y,
         width: this.state.width,
-        height: this.state.height
+        height: this.state.height,
+        didUpdate: true
       }
     )
+
+    // Prevent another tell on componentDidUpdate
+    this.doTellFlowspace = false;
+
   }
 
 
