@@ -106,30 +106,28 @@ export default class Flowspace extends Component {
 
 
   handleFlowspaceClick(e) {
+
+    // Testing click if this.props.onClick is defined
     if (this.props.onClick) {
-      var isSpaceClick = true;
+
+      // Testing helper variable
+      var isSpaceClick = false;
+
+      // Testing click target (don't fire if flowpoint or connection was clicked)
       if (e.target) {
-        if (e.target.className.baseVal === 'flowconnection') {
-          isSpaceClick = false;
-        }
+        const test = ['flowcontainer', 'flowspace', 'flowconnections']
+        if (test.includes(e.target.className.baseVal)) isSpaceClick = true;
+        if (test.includes(e.target.className)) isSpaceClick = true;
       }
+
+      // Potentially triggering user-defined onClick
       if (isSpaceClick) {
-        const x = e.pageX;
-        const y = e.pageY;
-        Object.keys(this.state).map(key => {
-          const p = this.state[key];
-          if (x >= p.x && y >= p.y) {
-            if (x <= p.x + p.width && y <= p.y + p.height) {
-              isSpaceClick = false;
-            }
-          }
-        })
-        if (isSpaceClick) {
-          this.props.onClick(e);
-          e.stopPropagation();
-        }
+        this.props.onClick(e);
+        e.stopPropagation();
       }
+
     }
+
   }
 
 
@@ -313,9 +311,9 @@ export default class Flowspace extends Component {
 
     // Returning finished Flowspace
     return (
-      <div style={style} onClick={this.handleFlowspaceClick}>
-        <div style={{width:maxX, height:maxY, position:'relative', overflow:'visible'}}>
-          <svg style={{width:'100%', height:'100%', position:'absolute', overflow:'visible'}}>
+      <div style={style} onClick={this.handleFlowspaceClick} className='flowcontainer'>
+        <div style={{width:maxX, height:maxY, position:'relative', overflow:'visible'}} className='flowspace'>
+          <svg style={{width:'100%', height:'100%', position:'absolute', overflow:'visible'}} className='flowconnections'>
             {
               gradients
             }

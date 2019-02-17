@@ -310,6 +310,7 @@ export default class Flowpoint extends Component {
     // Returning finished Flowpoint
     return (
       <div
+        className='flowpoint'
         key={this.state.id}
         style={style}
         onMouseOver={this.onMouseOver}
