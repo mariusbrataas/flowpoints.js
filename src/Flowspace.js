@@ -107,20 +107,27 @@ export default class Flowspace extends Component {
 
   handleFlowspaceClick(e) {
     if (this.props.onClick) {
-      const x = e.pageX;
-      const y = e.pageY;
       var isSpaceClick = true;
-      Object.keys(this.state).map(key => {
-        const p = this.state[key];
-        if (x >= p.x && y >= p.y) {
-          if (x <= p.x + p.width && y <= p.y + p.height) {
-            isSpaceClick = false;
-          }
+      if (e.target) {
+        if (e.target.className.baseVal === 'flowconnection') {
+          isSpaceClick = false;
         }
-      })
+      }
       if (isSpaceClick) {
-        this.props.onClick(e);
-        e.stopPropagation();
+        const x = e.pageX;
+        const y = e.pageY;
+        Object.keys(this.state).map(key => {
+          const p = this.state[key];
+          if (x >= p.x && y >= p.y) {
+            if (x <= p.x + p.width && y <= p.y + p.height) {
+              isSpaceClick = false;
+            }
+          }
+        })
+        if (isSpaceClick) {
+          this.props.onClick(e);
+          e.stopPropagation();
+        }
       }
     }
   }
