@@ -123,6 +123,7 @@ Possible locations: top, left, center (default), right, bottom.
   onLineClick={(key_a, key_b, e) => {
     console.log('Click connection ' + key_a + ' -> ' + key_b)
   }}
+  onClick={e => {console.log('Clicked empty space')}}
   > ... </Flowspace>
 ```
 
@@ -169,6 +170,9 @@ class App extends Component {
     return (
       <Flowspace
         style={{ height:"100vh", width:"100vw" }}
+        onClick={e => {
+          this.setState({ selected_point:null })
+        }}
         selected={this.state.selected_point}>
         {
           Object.keys(this.state.flowpoints).map(key => {
