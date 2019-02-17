@@ -333,7 +333,8 @@ class App extends Component {
           connectionSize={this.state.lineWidth}
           selected={this.state.selected}
           selectedLine={this.state.selectedLine}
-          onLineClick={this.handleClickLine}>
+          onLineClick={this.handleClickLine}
+          onClick={e => {this.setState({ selected:null, selectedLine:null })}}>
           {
             Object.keys(this.state.points).map(key => {
               var point = this.state.points[key]

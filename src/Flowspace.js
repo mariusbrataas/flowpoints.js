@@ -89,6 +89,7 @@ export default class Flowspace extends Component {
 
     // Binding class methods
     this.updateFlowspace = this.updateFlowspace.bind(this);
+    this.handleFlowspaceClick = this.handleFlowspaceClick.bind(this);
 
   }
 
@@ -101,6 +102,27 @@ export default class Flowspace extends Component {
 
   componentDidMount() {
     this.didMount = true;
+  }
+
+
+  handleFlowspaceClick(e) {
+    if (this.props.onClick) {
+      const x = e.pageX;
+      const y = e.pageY;
+      var isSpaceClick = true;
+      Object.keys(this.state).map(key => {
+        const p = this.state[key];
+        if (x >= p.x && y >= p.y) {
+          if (x <= p.x + p.width && y <= p.y + p.height) {
+            isSpaceClick = false;
+          }
+        }
+      })
+      if (isSpaceClick) {
+        this.props.onClick(e);
+        e.stopPropagation();
+      }
+    }
   }
 
 
@@ -284,7 +306,7 @@ export default class Flowspace extends Component {
 
     // Returning finished Flowspace
     return (
-      <div style={style}>
+      <div style={style} onClick={this.handleFlowspaceClick}>
         <div style={{width:maxX, height:maxY, position:'relative', overflow:'visible'}}>
           <svg style={{width:'100%', height:'100%', position:'absolute', overflow:'visible'}}>
             {
