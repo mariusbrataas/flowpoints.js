@@ -39,7 +39,7 @@ function GetConnectorLoc(p, loc) {
 
 
 // Checking wether connection crashes with other flowpoints
-function DoCrash(p1, p2, key1, key2, allPositions) {
+function DoCrash(p1, p2, key1, key2, allPositions, updated) {
 
   // Helpers
   var docrash = false;
@@ -54,7 +54,7 @@ function DoCrash(p1, p2, key1, key2, allPositions) {
 
   // Testing all positions
   Object.keys(allPositions).map(key => {
-    if (key !== key1 && key !== key2) {
+    if (key !== key1 && key !== key2 && (updated[key] || updated[key1] || updated[key2])) {
       if (!docrash) {
 
         // Loop specifics
@@ -102,7 +102,7 @@ function DoCrash(p1, p2, key1, key2, allPositions) {
 
 
 // Auto connector locations
-function AutoGetLoc(pa, pb, aLoc, bLoc, key1, key2, allPositions) {
+function AutoGetLoc(pa, pb, aLoc, bLoc, key1, key2, allPositions, updated, avoidCollisions) {
   var newLocs = {
     output: null,
     input: null
@@ -122,6 +122,7 @@ function AutoGetLoc(pa, pb, aLoc, bLoc, key1, key2, allPositions) {
     positions.map(posA => {
       const p1 = GetConnectorLoc(pa, posA);
       positions.map(posB => {
+
         const p2 = GetConnectorLoc(pb, posB);
         const d = Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
         if (d < best.d) {
@@ -129,11 +130,15 @@ function AutoGetLoc(pa, pb, aLoc, bLoc, key1, key2, allPositions) {
           best.output = p1;
           best.input = p2;
         }
-        if (d < bestNoCrash.d && !DoCrash(p1, p2, key1, key2, allPositions)) {
-          bestNoCrash.d = d;
-          bestNoCrash.output = p1;
-          bestNoCrash.input = p2;
+
+        if (avoidCollisions) {
+          if (d < bestNoCrash.d && !DoCrash(p1, p2, key1, key2, allPositions, updated)) {
+            bestNoCrash.d = d;
+            bestNoCrash.output = p1;
+            bestNoCrash.input = p2;
+          }
         }
+
       })
     })
     newLocs.output = aLoc === 'auto' ? (bestNoCrash.d !== Infinity ? bestNoCrash.output : best.output) : GetConnectorLoc(pa, aLoc);
@@ -301,9 +306,7 @@ export default class Flowspace extends Component {
         if (pa && pb) {
 
           // Calculate new positions or get old ones
-          if (this.updated[connection.a] || this.updated[connection.b]) {
-            this.positions[con_key] = AutoGetLoc(pa, pb, connection.outputLoc, connection.inputLoc, connection.a, connection.b, this.state);
-          }
+          this.positions[con_key] = AutoGetLoc(pa, pb, connection.outputLoc, connection.inputLoc, connection.a, connection.b, this.state, this.updated, (this.props.avoidCollisions === false ? false : true));
           var positions = this.positions[con_key];
 
           // Calculating bezier offsets and adding new path to list
