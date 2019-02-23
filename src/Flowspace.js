@@ -38,33 +38,106 @@ function GetConnectorLoc(p, loc) {
 }
 
 
+// Checking wether connection crashes with other flowpoints
+function DoCrash(p1, p2, key1, key2, allPositions) {
+
+  // Helpers
+  var docrash = false;
+  const a = (p2.y - p1.y) / (p2.x - p1.x);
+  const b = p1.y - a * p1.x;
+  function getx(y) {
+    return (y - b) / a
+  }
+  function gety(x) {
+    return a * x + b
+  }
+
+  // Testing all positions
+  Object.keys(allPositions).map(key => {
+    if (key !== key1 && key !== key2) {
+      if (!docrash) {
+
+        // Loop specifics
+        const pt = allPositions[key];
+        const x1 = getx(pt.y);
+        const x2 = getx(pt.y + pt.height);
+        const y1 = gety(pt.x);
+        const y2 = gety(pt.x + pt.width);
+        const p1x = p1.x + p1.offsetX;
+        const p1y = p1.y + p1.offsetY;
+        const p2x = p2.x + p2.offsetX;
+        const p2y = p2.y + p2.offsetY;
+
+        // Perfectly lined up?
+        if (Math.abs(p1.x - p2.x) < 1){
+          if (pt.x < p1.x && p1.x < pt.x + pt.width) {
+            if (Math.min(p1.y, p2.y) <= pt.y && pt.y <= Math.max(p1.y, p2.y)) {
+              docrash = true
+            }
+          }
+        }
+
+        // Passing through box?
+        if ((Math.min(p1x, p2x) < pt.x + pt.width && pt.x < Math.max(p1x, p2x)) && (Math.min(p1y, p2y) < pt.y + pt.height && pt.y < Math.max(p1y, p2y))) {
+            if (pt.x <= x1 && x1 <= pt.x + pt.width) docrash = true;
+            if (pt.x <= x2 && x2 <= pt.x + pt.width) docrash = true;
+            if (pt.y <= y1 && y1 <= pt.y + pt.height) docrash = true;
+            if (pt.y <= y2 && y2 <= pt.y + pt.height) docrash = true;
+        }
+        if ((Math.min(p1.x, p2.x) < pt.x + pt.width && pt.x < Math.max(p1.x, p2.x)) && (Math.min(p1.y, p2.y) < pt.y + pt.height && pt.y < Math.max(p1.y, p2.y))) {
+            if (pt.x <= x1 && x1 <= pt.x + pt.width) docrash = true;
+            if (pt.x <= x2 && x2 <= pt.x + pt.width) docrash = true;
+            if (pt.y <= y1 && y1 <= pt.y + pt.height) docrash = true;
+            if (pt.y <= y2 && y2 <= pt.y + pt.height) docrash = true;
+        }
+
+      }
+    }
+  })
+
+  // Returning
+  return docrash
+
+}
+
+
 // Auto connector locations
-function AutoGetLoc(pa, pb, aLoc, bLoc) {
+function AutoGetLoc(pa, pb, aLoc, bLoc, key1, key2, allPositions) {
   var newLocs = {
     output: null,
     input: null
   }
   if (aLoc === 'auto' || bLoc === 'auto') {
-    const positions = ['top','left','right','bottom'];
+    const positions = ['top','right','left','bottom'];
     var best = {
       d: Infinity,
       output: null,
       input: null
     };
+    var bestNoCrash = {
+      d: Infinity,
+      output: null,
+      input: null
+    }
     positions.map(posA => {
       const p1 = GetConnectorLoc(pa, posA);
       positions.map(posB => {
         const p2 = GetConnectorLoc(pb, posB);
-        const d = Math.pow(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2), 0.5);
+        const d = Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
         if (d < best.d) {
           best.d = d;
           best.output = p1;
           best.input = p2;
         }
+        if (d < bestNoCrash.d && !DoCrash(p1, p2, key1, key2, allPositions)) {
+          bestNoCrash.d = d;
+          bestNoCrash.output = p1;
+          bestNoCrash.input = p2;
+        }
       })
     })
-    newLocs.output = aLoc === 'auto' ? best.output : GetConnectorLoc(pa, aLoc);
-    newLocs.input = bLoc === 'auto' ? best.input : GetConnectorLoc(pb, bLoc);
+    newLocs.output = aLoc === 'auto' ? (bestNoCrash.d !== Infinity ? bestNoCrash.output : best.output) : GetConnectorLoc(pa, aLoc);
+    newLocs.input = bLoc === 'auto' ? (bestNoCrash.d !== Infinity ? bestNoCrash.input : best.input) : GetConnectorLoc(pb, bLoc);
   } else {
     newLocs.output = GetConnectorLoc(pa, aLoc);
     newLocs.input = GetConnectorLoc(pb, bLoc);
@@ -229,7 +302,7 @@ export default class Flowspace extends Component {
 
           // Calculate new positions or get old ones
           if (this.updated[connection.a] || this.updated[connection.b]) {
-            this.positions[con_key] = AutoGetLoc(pa, pb, connection.outputLoc, connection.inputLoc);
+            this.positions[con_key] = AutoGetLoc(pa, pb, connection.outputLoc, connection.inputLoc, connection.a, connection.b, this.state);
           }
           var positions = this.positions[con_key];
 
