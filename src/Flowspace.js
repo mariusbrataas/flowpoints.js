@@ -39,7 +39,7 @@ function GetConnectorLoc(p, loc) {
 
 
 // Checking wether connection crashes with other flowpoints
-function DoCrash(p1, p2, key1, key2, allPositions, updated) {
+function DoCrash(p1, p2, key1, key2, allPositions) {
 
   // Helpers
   var docrash = false;
@@ -54,7 +54,7 @@ function DoCrash(p1, p2, key1, key2, allPositions, updated) {
 
   // Testing all positions
   Object.keys(allPositions).map(key => {
-    if (key !== key1 && key !== key2 && (updated[key] || updated[key1] || updated[key2])) {
+    if (key !== key1 && key !== key2) {
       if (!docrash) {
 
         // Loop specifics
@@ -102,7 +102,7 @@ function DoCrash(p1, p2, key1, key2, allPositions, updated) {
 
 
 // Auto connector locations
-function AutoGetLoc(pa, pb, aLoc, bLoc, key1, key2, allPositions, updated, avoidCollisions) {
+function AutoGetLoc(pa, pb, aLoc, bLoc, key1, key2, allPositions, avoidCollisions) {
   var newLocs = {
     output: null,
     input: null
@@ -132,7 +132,7 @@ function AutoGetLoc(pa, pb, aLoc, bLoc, key1, key2, allPositions, updated, avoid
         }
 
         if (avoidCollisions) {
-          if (d < bestNoCrash.d && !DoCrash(p1, p2, key1, key2, allPositions, updated)) {
+          if (d < bestNoCrash.d && !DoCrash(p1, p2, key1, key2, allPositions)) {
             bestNoCrash.d = d;
             bestNoCrash.output = p1;
             bestNoCrash.input = p2;
@@ -306,7 +306,7 @@ export default class Flowspace extends Component {
         if (pa && pb) {
 
           // Calculate new positions or get old ones
-          this.positions[con_key] = AutoGetLoc(pa, pb, connection.outputLoc, connection.inputLoc, connection.a, connection.b, this.state, this.updated, (this.props.avoidCollisions === false ? false : true));
+          this.positions[con_key] = AutoGetLoc(pa, pb, connection.outputLoc, connection.inputLoc, connection.a, connection.b, this.state, (this.props.avoidCollisions === false ? false : true));
           var positions = this.positions[con_key];
 
           // Calculating bezier offsets and adding new path to list

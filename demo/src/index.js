@@ -334,6 +334,7 @@ class App extends Component {
           selected={this.state.selected}
           selectedLine={this.state.selectedLine}
           onLineClick={this.handleClickLine}
+          avoidCollisions
           onClick={e => {this.setState({ selected:null, selectedLine:null })}}>
           {
             Object.keys(this.state.points).map(key => {
