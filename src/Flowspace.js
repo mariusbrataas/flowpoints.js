@@ -1,159 +1,10 @@
 import React, { Component } from 'react';
 import Flowpoint from './Flowpoint.js';
-
-
-// Get connector location
-function GetConnectorLoc(p, loc) {
-  const base_offset = 100;
-  var location = {
-    x: p.x,
-    y: p.y,
-    offsetX: 0,
-    offsetY: 0
-  };
-  switch(loc[0]) {
-    case 't':
-      location.x += Math.round( p.width / 2 );
-      location.offsetY = -base_offset;
-      break;
-    case 'l':
-      location.y += Math.round( p.height / 2 );
-      location.offsetX = -base_offset;
-      break;
-    case 'r':
-      location.x += p.width;
-      location.y += Math.round( p.height / 2 );
-      location.offsetX = base_offset;
-      break;
-    case 'b':
-      location.x += Math.round( p.width / 2 );
-      location.y += p.height
-      location.offsetY = base_offset;
-      break;
-    default:
-      location.x += Math.round( p.width / 2 );
-      location.y += Math.round( p.height / 2 );
-  }
-  return location
-}
-
-
-// Checking wether connection crashes with other flowpoints
-function DoCrash(p1, p2, key1, key2, allPositions) {
-
-  // Helpers
-  var docrash = false;
-  const a = (p2.y - p1.y) / (p2.x - p1.x);
-  const b = p1.y - a * p1.x;
-  function getx(y) {
-    return (y - b) / a
-  }
-  function gety(x) {
-    return a * x + b
-  }
-
-  // Testing all positions
-  Object.keys(allPositions).map(key => {
-    if (key !== key1 && key !== key2) {
-      if (!docrash) {
-
-        // Loop specifics
-        const pt = allPositions[key];
-        const x1 = getx(pt.y);
-        const x2 = getx(pt.y + pt.height);
-        const y1 = gety(pt.x);
-        const y2 = gety(pt.x + pt.width);
-        const p1x = p1.x + p1.offsetX;
-        const p1y = p1.y + p1.offsetY;
-        const p2x = p2.x + p2.offsetX;
-        const p2y = p2.y + p2.offsetY;
-
-        // Perfectly lined up?
-        if (Math.abs(p1.x - p2.x) < 1){
-          if (pt.x < p1.x && p1.x < pt.x + pt.width) {
-            if (Math.min(p1.y, p2.y) <= pt.y && pt.y <= Math.max(p1.y, p2.y)) {
-              docrash = true
-            }
-          }
-        }
-
-        // Passing through box?
-        if ((Math.min(p1x, p2x) < pt.x + pt.width && pt.x < Math.max(p1x, p2x)) && (Math.min(p1y, p2y) < pt.y + pt.height && pt.y < Math.max(p1y, p2y))) {
-            if (pt.x <= x1 && x1 <= pt.x + pt.width) docrash = true;
-            if (pt.x <= x2 && x2 <= pt.x + pt.width) docrash = true;
-            if (pt.y <= y1 && y1 <= pt.y + pt.height) docrash = true;
-            if (pt.y <= y2 && y2 <= pt.y + pt.height) docrash = true;
-        }
-        if ((Math.min(p1.x, p2.x) < pt.x + pt.width && pt.x < Math.max(p1.x, p2.x)) && (Math.min(p1.y, p2.y) < pt.y + pt.height && pt.y < Math.max(p1.y, p2.y))) {
-            if (pt.x <= x1 && x1 <= pt.x + pt.width) docrash = true;
-            if (pt.x <= x2 && x2 <= pt.x + pt.width) docrash = true;
-            if (pt.y <= y1 && y1 <= pt.y + pt.height) docrash = true;
-            if (pt.y <= y2 && y2 <= pt.y + pt.height) docrash = true;
-        }
-
-      }
-    }
-  })
-
-  // Returning
-  return docrash
-
-}
-
-
-// Auto connector locations
-function AutoGetLoc(pa, pb, aLoc, bLoc, key1, key2, allPositions, avoidCollisions) {
-  var newLocs = {
-    output: null,
-    input: null
-  }
-  if (aLoc === 'auto' || bLoc === 'auto') {
-    const positions = ['top','right','left','bottom'];
-    var best = {
-      d: Infinity,
-      output: null,
-      input: null
-    };
-    var bestNoCrash = {
-      d: Infinity,
-      output: null,
-      input: null
-    }
-    positions.map(posA => {
-      const p1 = GetConnectorLoc(pa, posA);
-      positions.map(posB => {
-
-        const p2 = GetConnectorLoc(pb, posB);
-        const d = Math.sqrt(Math.pow(p2.x - p1.x, 2) + Math.pow(p2.y - p1.y, 2));
-        if (d < best.d) {
-          best.d = d;
-          best.output = p1;
-          best.input = p2;
-        }
-
-        if (avoidCollisions) {
-          if (d < bestNoCrash.d && !DoCrash(p1, p2, key1, key2, allPositions)) {
-            bestNoCrash.d = d;
-            bestNoCrash.output = p1;
-            bestNoCrash.input = p2;
-          }
-        }
-
-      })
-    })
-    newLocs.output = aLoc === 'auto' ? (bestNoCrash.d !== Infinity ? bestNoCrash.output : best.output) : GetConnectorLoc(pa, aLoc);
-    newLocs.input = bLoc === 'auto' ? (bestNoCrash.d !== Infinity ? bestNoCrash.input : best.input) : GetConnectorLoc(pb, bLoc);
-  } else {
-    newLocs.output = GetConnectorLoc(pa, aLoc);
-    newLocs.input = GetConnectorLoc(pb, bLoc);
-  }
-  return newLocs
-}
+import { getColor, AutoGetLoc } from './Helpers.js';
 
 
 // Component class
 export default class Flowspace extends Component {
-
 
   constructor(props) {
 
@@ -161,8 +12,6 @@ export default class Flowspace extends Component {
     this.state = {};
 
     // Helper variables
-    this.updated = {};
-    this.positions = {}; // To help preventing unnecessary calculations
     this.didMount = false; // Used to determine when drawing of connections should start
 
     // Binding class methods
@@ -173,8 +22,7 @@ export default class Flowspace extends Component {
 
 
   updateFlowspace(key, pos) {
-    this.updated[key] = true;
-    this.setState({[key]: pos});
+    this.setState({ [key]:pos });
   }
 
 
@@ -193,7 +41,7 @@ export default class Flowspace extends Component {
 
       // Testing click target (don't fire if flowpoint or connection was clicked)
       if (e.target) {
-        const test = ['flowcontainer', 'flowspace', 'flowconnections']
+        const test = ['flowcontainer', 'flowspace', 'flowconnections'];
         if (test.includes(e.target.className.baseVal)) isSpaceClick = true;
         if (test.includes(e.target.className)) isSpaceClick = true;
       }
@@ -211,12 +59,17 @@ export default class Flowspace extends Component {
 
   render() {
 
+    // Colors
+    const theme_colors = getColor(this.props.theme || 'indigo');
+    const background_color = getColor(this.props.background || 'white');
+    const selected = this.props.selected ? (Array.isArray(this.props.selected) ? this.props.selected : [this.props.selected]) : [];
+
     // Helper variables
-    var connections = []
-    var paths = []
-    var gradients = []
-    var maxX = 0
-    var maxY = 0
+    var connections = [];
+    var paths = [];
+    var gradients = [];
+    var maxX = 0;
+    var maxY = 0;
 
     // Extracting connections and adding updateFlowspace to all children
     var newKeys = []
@@ -224,7 +77,7 @@ export default class Flowspace extends Component {
 
       if (child.type === Flowpoint) {
 
-        const outputs = child.props.outputs
+        const outputs = child.props.outputs;
 
         // Outputs can be defined as array or object
         if (outputs instanceof Array) {
@@ -236,8 +89,8 @@ export default class Flowspace extends Component {
               width: this.props.connectionSize || 4,
               outputLoc: 'auto',
               inputLoc: 'auto',
-              outputColor: this.props.outputColor || '#0c00ff',
-              inputColor: this.props.inputColor || '#00fff2',
+              outputColor: theme_colors.p,
+              inputColor: this.props.noFade ? theme_colors.p : theme_colors.a,
               onClick: null
             });
           });
@@ -252,8 +105,8 @@ export default class Flowspace extends Component {
               width: output.width || this.props.connectionSize || 4,
               outputLoc: output.output || 'auto',
               inputLoc: output.input || 'auto',
-              outputColor: output.outputColor || this.props.outputColor || '#0c00ff',
-              inputColor: output.inputColor || this.props.inputColor || '#00fff2',
+              outputColor: output.outputColor || theme_colors.p,
+              inputColor: output.inputColor || (this.props.noFade ? theme_colors.p : theme_colors.a),
               onClick: output.onClick ? (e) => {output.onClick(child.key, out_key, e)} : this.props.onLineClick ? (e) => {this.props.onLineClick(child.key, out_key, e)} : null
             });
           });
@@ -267,7 +120,10 @@ export default class Flowspace extends Component {
         return React.cloneElement(child, {
           updateFlowspace:this.updateFlowspace,
           id:child.key,
-          selected:(child.props.selected || this.props.selected === child.key),
+          selected:(child.props.selected || selected.includes(child.key)),
+          spaceColor:background_color,
+          variant:(child.props.variant || (this.props.variant || 'paper')),
+          theme:(child.props.theme || (this.props.theme || 'indigo'))
         });
       };
 
@@ -284,8 +140,8 @@ export default class Flowspace extends Component {
       // Getting flowspace size
       Object.keys(this.state).map(key => {
         const point = this.state[key]
-        maxX = Math.max(maxX, point.x + 2 * point.width)
-        maxY = Math.max(maxY, point.y + 2 * point.height)
+        maxX = Math.max(maxX, point.x + 4 * point.width)
+        maxY = Math.max(maxY, point.y + 4 * point.height)
       })
 
       // Looping through connections and adding paths and gradients.
@@ -306,8 +162,7 @@ export default class Flowspace extends Component {
         if (pa && pb) {
 
           // Calculate new positions or get old ones
-          this.positions[con_key] = AutoGetLoc(pa, pb, connection.outputLoc, connection.inputLoc, connection.a, connection.b, this.state, (this.props.avoidCollisions === false ? false : true));
-          var positions = this.positions[con_key];
+          var positions = AutoGetLoc(pa, pb, connection.outputLoc, connection.inputLoc, connection.a, connection.b, this.state, (this.props.avoidCollisions === false ? false : true));
 
           // Calculating bezier offsets and adding new path to list
           const d = Math.round(Math.pow(Math.pow(positions.output.x - positions.input.x, 2) + Math.pow(positions.output.y - positions.input.y, 2), 0.5) / 2)
@@ -369,16 +224,13 @@ export default class Flowspace extends Component {
         }
       })
 
-      // Prevent more calculations than necessary
-      Object.keys(this.updated).map(testkey => {
-        this.updated[testkey] = false
-        if (!newCons.includes(testkey)) delete this.updated[testkey];
-      })
-
     }
 
     // Adding scroll (settings for overflow will be overwritten if defined by user)
-    var style = {overflow:'scroll'}
+    var style = {
+      overflow:'scroll',
+      backgroundColor: background_color.p
+    };
     if (this.props.style) {
       Object.keys(this.props.style).map(propkey => {
         style[propkey] = this.props.style[propkey];
@@ -389,6 +241,7 @@ export default class Flowspace extends Component {
     return (
       <div style={style} onClick={this.handleFlowspaceClick} className='flowcontainer'>
         <div style={{width:maxX, height:maxY, position:'relative', overflow:'visible'}} className='flowspace'>
+
           <svg style={{width:'100%', height:'100%', position:'absolute', overflow:'visible'}} className='flowconnections'>
             {
               gradients
@@ -397,9 +250,11 @@ export default class Flowspace extends Component {
               paths
             }
           </svg>
+
           {
             childrenWithProps
           }
+
         </div>
       </div>
     )

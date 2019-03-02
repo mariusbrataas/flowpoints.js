@@ -22,17 +22,13 @@ import { Flowpoint, Flowspace } from 'flowpoints';
 
 ...
 <Flowspace>
-  <Flowpoint key={"point_a"} outputs={["point_b"]}>
-    <div>
-      Hello world
-      ...
-    </div>
+  <Flowpoint key="point_a" outputs={["point_b"]}>
+    Hello world
+    ...
   </Flowpoint>
-  <Flowpoint key={"point_b"}>
-    <div>
-      I am point b
-      ...
-    </div>
+  <Flowpoint key="point_b">
+    I am point b
+    ...
   </Flowpoint>
 </Flowspace>
 ...
@@ -43,6 +39,38 @@ To create a new diagram start by creating open-and-close tags for the "Flowspace
 
 ### No-drag areas
 To create a no-drag area simply set the className of your component/element to "nodrag".
+
+
+### Variants
+Can be defined for all flowpoints in the flowspace-props, or individually in each flowpoint's props.
+
+![](assets/paper.png)
+
+![](assets/outlined.png)
+
+![](assets/filled.png)
+
+### Themes
+Used to determine the colors used for the flowpoints. Available themes:
+
+- red
+- purple
+- deep-purple
+- indigo
+- blue
+- light-blue
+- green
+- light-green
+- lime
+- yellow
+- amber
+- orange
+- deep-orange
+- brown
+- grey
+- blue-grey
+- black
+- white
 
 
 ### Outputs
@@ -62,8 +90,9 @@ Create an object using the following pattern:
   key="point_a"
   outputs={{
     "point_b": {
-      output: "right",
-      input: "left"
+      output: "auto",
+      input: "auto",
+      inputColor: "red"
     },
     "point_c": {
       output: "right",
@@ -82,6 +111,8 @@ Possible locations: top, left, center (default), right, bottom.
 ```js
 <Flowpoint
   key="point_a"
+  theme="indigo"
+  variant="outlined"
   outputs={{
     "point_b": {
       output:"right",
@@ -96,7 +127,6 @@ Possible locations: top, left, center (default), right, bottom.
   style={{ backgroundColor:'lightblue' }}
   startPosition={{ x:250, y:100 }}
   selected={false}
-  noShadow={false}
   snap={{ x:10, y:10 }}
   dragX={true}
   dragY={true}
@@ -114,9 +144,10 @@ Possible locations: top, left, center (default), right, bottom.
 ### Flowspace props
 ```js
 <Flowspace
+  theme="indigo"
+  variant="outlined"
+  background="white"
   style={{ width:'100vw', height:'100vh' }}
-  inputColor="#00fff2"
-  outputColor="#0c00ff"
   connectionSize=4
   selected="point_a"
   selectedLine={{ a:"point_a", b:"point_b" }}
@@ -127,7 +158,7 @@ Possible locations: top, left, center (default), right, bottom.
   > ... </Flowspace>
 ```
 
-Colors and connectionSizes passed to the flowspace will be the default values used when drawing connections. A different value specified by a flowpoint's outputs will replace the default value for that connection only.
+Themes, variants and connectionSizes passed to the flowspace will be the default values used when drawing connections. A different value specified by a flowpoint's outputs will replace the default value for that connection only.
 
 ## Suggested pattern
 
@@ -169,6 +200,9 @@ class App extends Component {
   render() {
     return (
       <Flowspace
+        theme="indigo"
+        variant="outlined"
+        background="black"
         style={{ height:"100vh", width:"100vw" }}
         onClick={e => {
           this.setState({ selected_point:null })

@@ -1,15 +1,10 @@
 import React, { Component } from 'react';
 
-
-// Seems easier to put this here rather than inside the event handlers (onMouseMove, onTouchMove)
-function CalcPos(pos, snap, minimum) {
-  return Math.max(minimum, Math.round(pos + snap - (pos % snap)))
-}
+import { CalcPos, getColor } from './Helpers.js';
 
 
 // Component class
 export default class Flowpoint extends Component {
-
 
   constructor(props) {
 
@@ -18,8 +13,6 @@ export default class Flowpoint extends Component {
 
       // Helpers
       id: props.id,
-      selected: (props.selected === undefined) ? false : props.selected,
-      noShadow: (props.noShadow === undefined) ? false : props.noShadow,
 
       // Snap to grid
       snap: (props.snap === undefined) ? {x:1, y:1} : props.snap,
@@ -289,6 +282,9 @@ export default class Flowpoint extends Component {
 
   render() {
 
+    // Colors
+    const c = getColor(this.props.theme)
+
     // Prepping default style (and adds updated position)
     var style = {
       width: this.props.width || this.state.width,
@@ -296,32 +292,61 @@ export default class Flowpoint extends Component {
       left: this.state.pos.x + 'px',
       top: this.state.pos.y + 'px',
       position: 'absolute',
-      backgroundColor: 'white',
-      boxShadow: this.state.noShadow ? null : this.props.selected ? '2px 2px 3px rgba(0,0,0,0.12), 0 3px 3px rgba(0,0,0,0.24)' : '2px 2px 3px rgba(0,0,0,0.12), 0 1px 1px rgba(0,0,0,0.24)'
+      transition: ['border-color 0.4s ease-out','background-color 0.4s ease-out'],
+      backgroundColor: this.props.spaceColor.p,
+      color: (this.props.spaceColor.t === 'light' ? '#ffffff' : '#000000'),
+      boxShadow: null,
+      borderColor: null,
+      borderStyle: null,
+      borderWidth: null,
+      borderRadius: null,
+      fontWeight: null
+    }
+
+    // Paper?
+    if (this.props.variant === 'paper') {
+      style.boxShadow = this.props.selected ? '2px 2px 3px rgba(0,0,0,0.12), 0 3px 3px rgba(0,0,0,0.24)' : '2px 2px 3px rgba(0,0,0,0.12), 0 1px 1px rgba(0,0,0,0.24)';
+    }
+
+    // Outlined?
+    if (this.props.variant === 'outlined') {
+      style.borderColor = this.props.selected ? c.o : c.p;
+      style.borderStyle = 'solid';
+      style.borderWidth = '1px';
+      style.borderRadius = '5px';
+    }
+
+    // Filled?
+    if (this.props.variant === 'filled') {
+      style.backgroundColor = this.props.selected ? c.s : c.p;
+      style.color = (c.t === 'light' ? '#ffffff' : '#000000')
+      style.borderColor = style.backgroundColor;
+      style.borderStyle = 'solid';
+      style.borderWidth = '1px';
+      style.borderRadius = '5px';
+      style.fontWeight = 500;
     }
 
     // Adding user defined styles
     if (this.props.style) {
-      Object.keys(this.props.style).map(key => {
-        style[key] = this.props.style[key];
-      })
+      Object.keys(this.props.style).map(key => style[key] = this.props.style[key])
     }
 
     // Returning finished Flowpoint
     return (
       <div
-        className='flowpoint'
-        key={this.state.id}
-        style={style}
-        onMouseOver={this.onMouseOver}
-        onMouseOut={this.onMouseOut}
-        onMouseDown={(e) => {this.onMouseDown(e)}}
-        onMouseUp={(e) => {this.onMouseUp(e)}}
-        onMouseMove={(e) => {this.onMouseMove(e)}}
-        onTouchStart={(e) => {this.onTouchStart(e)}}
-        onTouchEnd={(e) => {this.onTouchEnd(e)}}
-        onTouchCancel={(e) => {this.onTouchEnd(e)}}
-        onTouchMove={(e) => {this.onTouchMove(e)}}>
+        className     = 'flowpoint'
+        key           = {this.state.id}
+        style         = {style}
+        onMouseOver   = {this.onMouseOver}
+        onMouseOut    = {this.onMouseOut}
+        onMouseDown   = {(e) => {this.onMouseDown(e)}}
+        onMouseUp     = {(e) => {this.onMouseUp(e)}}
+        onMouseMove   = {(e) => {this.onMouseMove(e)}}
+        onTouchStart  = {(e) => {this.onTouchStart(e)}}
+        onTouchEnd    = {(e) => {this.onTouchEnd(e)}}
+        onTouchCancel = {(e) => {this.onTouchEnd(e)}}
+        onTouchMove   = {(e) => {this.onTouchMove(e)}}>
         {
           this.props.children
         }

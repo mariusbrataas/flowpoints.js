@@ -2,10 +2,20 @@ import React, { Component } from "react";
 import ReactDOM from "react-dom";
 import './index.css';
 
+import MenuItem from '@material-ui/core/MenuItem';
+import Select from '@material-ui/core/Select';
+import InputLabel from '@material-ui/core/InputLabel';
+import FormControl from '@material-ui/core/FormControl';
+import TextField from '@material-ui/core/TextField';
+import Button from '@material-ui/core/Button';
+
 import { Flowspace, Flowpoint } from '../../src';
 
 var myImg1 = require('../../assets/favicon.ico');
 var myImg2 = require('../../assets/this_is_flowpoints.png');
+var myImg2 = require('../../assets/filled.png');
+var myImg2 = require('../../assets/outlined.png');
+var myImg2 = require('../../assets/paper.png');
 
 
 /*
@@ -24,6 +34,28 @@ function num2string(num) {
 function string2num(str) {
   return parseInt(str, 36)
 }
+
+const themes = [
+  'red',
+  'pink',,
+  'purple',
+  'deep-purple',
+  'indigo',
+  'blue',
+  'light-blue',
+  'green',
+  'light-green',
+  'lime',
+  'yellow',
+  'amber',
+  'orange',
+  'deep-orange',
+  'brown',
+  'grey',
+  'blue-grey',
+  'black',
+  'white'
+]
 
 
 // Parse from current state to query
@@ -101,7 +133,10 @@ class App extends Component {
       inputColor: '#00fff2',
       outputColor: '#0c00ff',
       lineWidth: 4,
-      points: {}
+      points: {},
+      theme: 'indigo',
+      variant: 'paper',
+      background: 'white'
     }
 
     // Helper variables
@@ -170,7 +205,7 @@ class App extends Component {
 
   handleAddPoint() {
     var newpoint = {
-      msg: 'Message',
+      msg: '',
       pos: {x:50, y:50},
       outputs: {},
     }
@@ -181,7 +216,7 @@ class App extends Component {
   }
 
 
-  handleClick(id) {
+  handleClick(id, e) {
     var selected = this.state.selected
     var points = this.state.points
     if (selected === null) {
@@ -213,51 +248,99 @@ class App extends Component {
       boxShadow:'0 1px 2px rgba(0,0,0,0.12), 0 1px 2px rgba(0,0,0,0.24)'
     }
     return (
-      <div style={{top:'10px', right:'10px', position:'fixed'}}>
+      <div style={{top:'10px', right:'10px', position:'fixed', width:230}}>
         <div style={boxStyle}>
+
           <h2 style={{marginTop:'2px'}}>Settings</h2>
-          <form onSubmit={(e) => {e.preventDefault()}}>
-            <label>
-              Input color:
-              <input
-                style={{marginLeft:'10px'}}
-                value={this.state.inputColor}
+
+          <div style={{paddingBottom:10}}>
+            <FormControl style={{width:'100%'}}>
+              <InputLabel htmlFor='backselect'>Background</InputLabel>
+              <Select
+                value={this.state.background}
+                inputProps={{ name:'back select', id:'backselect'}}
                 onChange={(e) => {
-                  this.setState({inputColor: e.target.value})
-                }}/>
-            </label>
-          </form>
-          <form onSubmit={(e) => {e.preventDefault()}}>
-            <label>
-              Output color:
-              <input
-                style={{marginLeft:'10px'}}
-                value={this.state.outputColor}
+                  this.setState({background:e.target.value})
+                }}>
+                {
+                  themes.map(themename => {
+                    return (
+                      <MenuItem value={themename}>{themename}</MenuItem>
+                    )
+                  })
+                }
+              </Select>
+            </FormControl>
+          </div>
+
+          <div style={{paddingBottom:10}}>
+            <FormControl style={{width:'100%'}}>
+              <InputLabel htmlFor='themeselect'>Theme</InputLabel>
+              <Select
+                value={this.state.theme}
+                inputProps={{ name:'theme select', id:'themeselect'}}
                 onChange={(e) => {
-                  this.setState({outputColor: e.target.value})
-                }}/>
-            </label>
-          </form>
-          <form onSubmit={(e) => {e.preventDefault()}}>
-            <label>
-              Linewidth:
-              <input
-                style={{marginLeft:'10px'}}
-                value={this.state.lineWidth}
-                type='number'
+                  this.setState({theme:e.target.value})
+                }}>
+                {
+                  themes.map(themename => {
+                    return (
+                      <MenuItem value={themename}>{themename}</MenuItem>
+                    )
+                  })
+                }
+              </Select>
+            </FormControl>
+          </div>
+
+          <div>
+            <FormControl style={{width:'100%'}}>
+              <InputLabel htmlFor='variantselect'>Variant</InputLabel>
+              <Select
+                value={this.state.variant}
+                inputProps={{ name:'variant select', id:'variantselect'}}
                 onChange={(e) => {
-                  this.setState({lineWidth: e.target.value})
-                }}/>
-            </label>
+                  this.setState({variant:e.target.value})
+                }}>
+                {
+                  ['paper','outlined','filled'].map(variantname => {
+                    return (
+                      <MenuItem value={variantname}>{variantname}</MenuItem>
+                    )
+                  })
+                }
+              </Select>
+            </FormControl>
+          </div>
+
+          <form onSubmit={(e) => {e.preventDefault()}}>
+            <TextField
+              id="linewidthfield"
+              label="Line width"
+              value={this.state.lineWidth}
+              onChange={(e) => {this.setState({lineWidth:e.target.value})}}
+              type="number"
+              InputLabelProps={{
+                shrink: true,
+              }}
+              style={{width:'100%'}}
+              margin="normal"/>
           </form>
-          <button onClick={this.handleAddPoint}>Add new flowpoint</button>
+
+          <Button variant="outlined" onClick={this.handleAddPoint}>
+            Add flowpoint
+          </Button>
+
         </div>
+
         {
           this.state.selected !== null && this.state.selected in this.state.points ?
             <div style={boxStyle}>
+
               <h2 style={{marginTop:'2px'}}>Flowpoint contents</h2>
-              <button
-                style={{marginBottom:'10px'}}
+
+              <Button
+                variant="outlined"
                 onClick={(e) => {
                   var selected = this.state.selected;
                   var points = {}
@@ -266,54 +349,73 @@ class App extends Component {
                   })
                   if (Object.keys(points).length === 0) this.count = 0
                   this.setState({selected:null, points})
-                }}>Delete</button>
+                }}>
+                Delete
+              </Button>
+
               <form onSubmit={(e) => {e.preventDefault()}}>
-                <label>
-                  Message:
-                  <input
-                    style={{marginLeft:'10px'}}
-                    ref={(msgRef) => {
-                      if (msgRef) msgRef.focus()
-                    }}
-                    onFocus={e => {e.target.select()}}
-                    value={this.state.points[this.state.selected].msg}
-                    onChange={(e) => {
-                      var points = this.state.points
-                      var point = points[this.state.selected]
-                      point.msg = e.target.value
-                      this.setState({points: points})
-                    }}/>
-                </label>
+                <TextField
+                  id="msgfield"
+                  label="Message"
+                  value={this.state.points[this.state.selected].msg}
+                  onChange={(e) => {
+                    var points = this.state.points
+                    var point = points[this.state.selected]
+                    point.msg = e.target.value
+                    this.setState({points: points})
+                  }}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  style={{width:'100%'}}
+                    margin="normal"/>
               </form>
+
             </div>
             : null
         }
+
         {
           this.state.selectedLine !== null ?
             <div style={boxStyle}>
               <h2 style={{marginTop:'2px'}}>Connection</h2>
               {
+
                 ['input', 'output'].map(dir_key => {
                   return (
                     <div>
-                      <h4 style={{marginTop:'5px', marginBottom:'2px'}}>{dir_key + ' position'}</h4>
-                      {
-                        ['auto', 'top', 'left', 'center', 'right', 'bottom'].map(pos_key => {
-                          return (
-                            <button
-                              style={{marginTop:'2px'}}
-                              onClick={(e) => {
-                                var points = this.state.points
-                                var output = points[this.state.selectedLine.a].outputs[this.state.selectedLine.b]
-                                output[dir_key] = pos_key
-                                this.setState({points})
-                              }}>{pos_key}</button>
-                          )
-                        })
-                      }
+
+                      <div style={{paddingBottom:10}}>
+
+                        <FormControl style={{width:'100%'}}>
+                          <InputLabel htmlFor='posselect'>{dir_key + ' position'}</InputLabel>
+
+                          <Select
+                            value={this.state.points[this.state.selectedLine.a].outputs[this.state.selectedLine.b][dir_key]}
+                            inputProps={{ name:'pos select', id:'posselect'}}
+                            onChange={(e) => {
+                              var points = this.state.points
+                              var output = points[this.state.selectedLine.a].outputs[this.state.selectedLine.b]
+                              output[dir_key] = e.target.value
+                              this.setState({points})
+                            }}>
+                            {
+                              ['auto', 'top', 'left', 'center', 'right', 'bottom'].map(posname => {
+                                return (
+                                  <MenuItem value={posname}>{posname}</MenuItem>
+                                )
+                              })
+                            }
+                          </Select>
+
+                        </FormControl>
+
+                      </div>
+
                     </div>
                   )
                 })
+
               }
             </div>
             : null
@@ -327,19 +429,23 @@ class App extends Component {
     return (
       <div>
         <Flowspace
+          theme={this.state.theme}
+          variant={this.state.variant}
+          background={this.state.background}
+          avoidCollisions
           style={{height:'100vh', width:'100vw'}}
-          inputColor={this.state.inputColor}
-          outputColor={this.state.outputColor}
           connectionSize={this.state.lineWidth}
           selected={this.state.selected}
           selectedLine={this.state.selectedLine}
           onLineClick={this.handleClickLine}
-          avoidCollisions
           onClick={e => {this.setState({ selected:null, selectedLine:null })}}>
+
           {
             Object.keys(this.state.points).map(key => {
               var point = this.state.points[key]
+
               return (
+
                 <Flowpoint
                   key={key}
                   snap={{x:10, y:10}}
@@ -354,14 +460,17 @@ class App extends Component {
                   <div style={{display:'table', width:'100%', height:'100%'}}>
                     <div style={{display:'table-cell', verticalAlign:'middle', textAlign:'center'}}>
                       {
-                        point.msg
+                        point.msg !== '' ? point.msg : 'empty'
                       }
                     </div>
                   </div>
                 </Flowpoint>
+
               )
+
             })
           }
+
         </Flowspace>
         {
           this.settingsBox()
