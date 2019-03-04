@@ -62,7 +62,8 @@ class App extends Component {
       lastPos: {x:300, y:50},
       snackShow: false,
       snackMsg: '',
-      snackColor: blue[500]
+      snackColor: blue[500],
+      doFocus: false
     }
 
     // Helper variables
@@ -73,6 +74,7 @@ class App extends Component {
 
     // Binding class methods
     this.handleClick = this.handleClick.bind(this)
+    this.handleTouch = this.handleTouch.bind(this)
     this.settingsBox = this.settingsBox.bind(this)
     this.infoBox = this.infoBox.bind(this)
     this.handleAddPoint = this.handleAddPoint.bind(this)
@@ -157,6 +159,7 @@ class App extends Component {
 
 
   handleClick(id, e) {
+    this.doFocus = true;
     var selected = this.state.selected
     var points = this.state.points
     if (e.shiftKey) {
@@ -178,6 +181,30 @@ class App extends Component {
       }
     } else {
       selected = (selected === null ? id : (selected === id ? null : id))
+    }
+    this.setState({selected, points})
+  }
+
+
+  handleTouch(id, e) {
+    this.doFocus = false;
+    var selected = this.state.selected
+    var points = this.state.points
+    if (selected === null) {
+      selected = id
+    } else {
+      if (selected !== id) {
+        var p1 = points[selected]
+        if (id in p1.outputs) {
+          delete p1.outputs[id]
+        } else {
+          p1.outputs[id] = {
+            output:'auto',
+            input:'auto',
+            onClick:this.handleClickLine
+          }
+        }
+      }
     }
     this.setState({selected, points})
   }
@@ -334,6 +361,7 @@ class App extends Component {
                     id="msgfield"
                     label="Message"
                     autoComplete="off"
+                    inputRef={(input) => {if (this.doFocus && input) input.focus()}}
                     value={this.state.points[this.state.selected].msg}
                     onChange={(e) => {
                       var points = this.state.points
@@ -397,6 +425,7 @@ class App extends Component {
                   startPosition={point.pos}
                   outputs={point.outputs}
                   onClick={e => {this.handleClick(key, e)}}
+                  onTouch={e => {this.handleTouch(key, e)}}
                   onDrag={pos => {
                     var points = this.state.points;
                     points[key].pos = pos;

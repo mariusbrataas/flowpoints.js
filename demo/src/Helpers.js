@@ -75,7 +75,7 @@ export function parseFromQuery(rawquery) {
   var query = rawquery.replace(/%s0/g, ' ')
   var newLib = { points:{} }
   var queries = query.split(lvls[0])
-  newLib['theme'] = (queries[0] === 'R' ? null : themes[num2string(queries[0])])
+  newLib['theme'] = (queries[0] === 'R' ? null : themes[string2num(queries[0])])
   newLib['variant'] = queries[1]
   newLib['lineWidth'] = string2num(queries[2])
   newLib['count'] = string2num(queries[3])

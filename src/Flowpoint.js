@@ -44,6 +44,7 @@ export default class Flowpoint extends Component {
 
     // User defined event handlers
     this.onClick = props.onClick;
+    this.onTouch = props.onTouch;
     this.onDrag = props.onDrag;
     this.onHover = props.onHover;
 
@@ -150,7 +151,7 @@ export default class Flowpoint extends Component {
   onTouchEnd(e) {
 
     // Trigger user-defined onClick?
-    if (!this.didDrag) this.onClick(e)
+    if (!this.didDrag) this.onTouch(e)
 
     // Resetting drag
     this.setState({drag: false})
