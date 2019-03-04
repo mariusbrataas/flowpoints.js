@@ -1,4 +1,5 @@
 import React, { Component } from 'react';
+
 import Flowpoint from './Flowpoint.js';
 import { getColor, AutoGetLoc } from './Helpers.js';
 
