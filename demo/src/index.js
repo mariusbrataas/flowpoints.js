@@ -17,8 +17,6 @@ import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
-import FormControlLabel from '@material-ui/core/FormControlLabel';
-import Switch from '@material-ui/core/Switch';
 import Snackbar from '@material-ui/core/Snackbar';
 import SnackbarContent from '@material-ui/core/SnackbarContent';
 
@@ -30,14 +28,10 @@ import HelpIcon from '@material-ui/icons/Help';
 
 import green from '@material-ui/core/colors/green';
 import orange from '@material-ui/core/colors/orange';
-import red from '@material-ui/core/colors/red';
-import grey from '@material-ui/core/colors/grey';
 import blue from '@material-ui/core/colors/blue';
 import indigo from '@material-ui/core/colors/indigo';
 import deepPurple from '@material-ui/core/colors/deepPurple';
 import lightBlue from '@material-ui/core/colors/lightBlue';
-import teal from '@material-ui/core/colors/teal';
-import blueGrey from '@material-ui/core/colors/blueGrey';
 
 import { Flowspace, Flowpoint } from '../../src';
 
