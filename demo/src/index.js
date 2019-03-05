@@ -35,11 +35,16 @@ import lightBlue from '@material-ui/core/colors/lightBlue';
 
 import { Flowspace, Flowpoint } from '../../src';
 
-var myImg1 = require('../../assets/favicon.ico');
-var myImg2 = require('../../assets/this_is_flowpoints.png');
-var myImg2 = require('../../assets/filled.png');
-var myImg2 = require('../../assets/outlined.png');
-var myImg2 = require('../../assets/paper.png');
+var myImg = require('../../assets/favicon.ico');
+var myImg = require('../../assets/this_is_flowpoints.png');
+var myImg = require('../../assets/filled.png');
+var myImg = require('../../assets/outlined.png');
+var myImg = require('../../assets/paper.png');
+var myImg = require('../../assets/sample_1.png');
+var myImg = require('../../assets/sample_2.png');
+var myImg = require('../../assets/sample_3.png');
+
+var htmlToImage = require('html-to-image');
 
 
 // Main example
@@ -67,6 +72,7 @@ class App extends Component {
     }
 
     // Helper variables
+    this.diagramRef = null;
     this.baseUrl = window.location.href.split('/?p=')[0]
     if (this.baseUrl[this.baseUrl.length - 1] !== '/') this.baseUrl += '/'
     this.count = Object.keys(this.state.points).length
@@ -347,6 +353,22 @@ class App extends Component {
                   margin="normal"/>
               </form>
 
+              <Button
+                variant="outlined"
+                onClick={(e) => {
+                  htmlToImage.toPng(this.diagramRef).then(function (dataUrl) {
+                    var img = new Image();
+                    img.src = dataUrl;
+                    console.log(img)
+                    var link = document.createElement('a');
+                    link.download = 'diagram.png';
+                    link.href = dataUrl;
+                    link.click();
+                  })
+                }}>
+                Export
+              </Button>
+
             </CardContent>
           </Card> : null
         }
@@ -402,50 +424,54 @@ class App extends Component {
   render() {
     return (
       <MuiThemeProvider theme={darktheme}>
-        <Flowspace
-          theme={this.state.theme}
-          variant={this.state.variant}
-          background={this.state.background}
-          avoidCollisions
-          style={{height:'100vh', width:'100vw'}}
-          connectionSize={this.state.lineWidth}
-          selected={this.state.selected}
-          onClick={e => {this.setState({ selected:null, selectedLine:null })}}>
 
-          {
-            Object.keys(this.state.points).map(key => {
-              var point = this.state.points[key]
+        <div>
+          <Flowspace
+            theme={this.state.theme}
+            variant={this.state.variant}
+            background={this.state.background}
+            getDiagramRef={ref => {this.diagramRef = ref}}
+            avoidCollisions
+            style={{height:'100vh', width:'100vw'}}
+            connectionSize={this.state.lineWidth}
+            selected={this.state.selected}
+            onClick={e => {this.setState({ selected:null, selectedLine:null })}}>
 
-              return (
+            {
+              Object.keys(this.state.points).map(key => {
+                var point = this.state.points[key]
 
-                <Flowpoint
-                  key={key}
-                  snap={{x:10, y:10}}
-                  style={{height:Math.max(50, Math.ceil(point.msg.length / 20) * 30)}}
-                  startPosition={point.pos}
-                  outputs={point.outputs}
-                  onClick={e => {this.handleClick(key, e)}}
-                  onTouch={e => {this.handleTouch(key, e)}}
-                  onDrag={pos => {
-                    var points = this.state.points;
-                    points[key].pos = pos;
-                    this.setState({points, lastPos:pos})
-                  }}>
-                  <div style={{display:'table', width:'100%', height:'100%'}}>
-                    <div style={{display:'table-cell', verticalAlign:'middle', textAlign:'center', paddingLeft:2, paddingRight:2}}>
-                      {
-                        point.msg !== '' ? point.msg : 'empty'
-                      }
+                return (
+
+                  <Flowpoint
+                    key={key}
+                    snap={{x:10, y:10}}
+                    style={{height:Math.max(50, Math.ceil(point.msg.length / 20) * 30)}}
+                    startPosition={point.pos}
+                    outputs={point.outputs}
+                    onClick={e => {this.handleClick(key, e)}}
+                    onTouch={e => {this.handleTouch(key, e)}}
+                    onDrag={pos => {
+                      var points = this.state.points;
+                      points[key].pos = pos;
+                      this.setState({points, lastPos:pos})
+                    }}>
+                    <div style={{display:'table', width:'100%', height:'100%'}}>
+                      <div style={{display:'table-cell', verticalAlign:'middle', textAlign:'center', paddingLeft:2, paddingRight:2}}>
+                        {
+                          point.msg !== '' ? point.msg : 'empty'
+                        }
+                      </div>
                     </div>
-                  </div>
-                </Flowpoint>
+                  </Flowpoint>
 
-              )
+                )
 
-            })
-          }
+              })
+            }
 
-        </Flowspace>
+          </Flowspace>
+        </div>
 
         {
           this.state.showInfobox ? this.infoBox() : this.settingsBox()

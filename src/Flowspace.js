@@ -242,20 +242,22 @@ export default class Flowspace extends Component {
     return (
       <div style={style} onClick={this.handleFlowspaceClick} className='flowcontainer'>
         <div style={{width:maxX, height:maxY, position:'relative', overflow:'visible'}} className='flowspace'>
+          <div ref={ref => {if (this.props.getDiagramRef) this.props.getDiagramRef(ref)}} style={{width:'100%', height:'100%', backgroundColor:background_color.p}}>
 
-          <svg style={{width:'100%', height:'100%', position:'absolute', overflow:'visible'}} className='flowconnections'>
+            <svg style={{width:'100%', height:'100%', position:'absolute', overflow:'visible'}} className='flowconnections'>
+              {
+                gradients
+              }
+              {
+                paths
+              }
+            </svg>
+
             {
-              gradients
+              childrenWithProps
             }
-            {
-              paths
-            }
-          </svg>
 
-          {
-            childrenWithProps
-          }
-
+          </div>
         </div>
       </div>
     )
