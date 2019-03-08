@@ -151,13 +151,15 @@ export default class Flowpoint extends Component {
   onTouchEnd(e) {
 
     // Trigger user-defined onClick?
-    if (!this.didDrag) this.onTouch(e)
+    if (!this.didDrag) {
+      this.onTouch(e)
+    } else {
+      // Updating flowspace
+      this.tellFlowspace()
+    }
 
     // Resetting drag
     this.setState({drag: false})
-
-    // Updating flowspace
-    this.tellFlowspace()
 
     // Final routines
     e.stopPropagation()

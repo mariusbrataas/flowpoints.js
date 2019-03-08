@@ -115,9 +115,10 @@ class App extends Component {
       theme:opts[Math.round(Math.random() * opts.length)],
       variant:(Math.random() < 0.5 ? 'outlined' : 'filled')
     })
-    const query = window.location.href.split(this.baseUrl)[1].substring(3)
+    var query = window.location.href.split(this.baseUrl)[1].substring(3)
     if (query) {
       try {
+        query = query.slice(0, 15)
         getDB(data => {
           if (query in data) {
             var newLib = parseFromQuery(data[query])

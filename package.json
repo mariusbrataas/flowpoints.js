@@ -1,6 +1,6 @@
 {
   "name": "flowpoints",
-  "version": "1.0.11",
+  "version": "1.0.12",
   "description": "A developer-friendly library for creating flowcharts and diagrams.",
   "main": "dist/index.js",
   "scripts": {
@@ -19,10 +19,12 @@
     "url": "https://github.com/mariusbrataas/flowpoints.git"
   },
   "keywords": [
+    "web",
     "react",
     "draggable",
     "react-component",
     "diagram",
+    "diagrams",
     "flowchart",
     "javascript"
   ],
