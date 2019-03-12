@@ -38,8 +38,9 @@ export function postToDB(content, cb) {
   const mod_id = getId();
   var url = 'https://docs.google.com/forms/d/e/1FAIpQLSfrs2Vx7yfwja-re-XXH_rJZphh--8wXZhYZthpefKGcj6KKQ/formResponse?usp=pp_url'
   url += '&entry.1418173025=' + mod_id;
-  url += '&entry.1980854326=' + content;
+  url += '&entry.1980854326=' + ReplaceAll(content, ' ', '+');
   url += '&submit=Submit'
+  console.log(url)
   axios.get(url).then(res => {})
   cb(mod_id)
 }

@@ -47,6 +47,12 @@ var myImg = require('../../assets/sample_3.png');
 var htmlToImage = require('html-to-image');
 
 
+function ReplaceAll(str, search, replacement) {
+  var newstr = ''
+  str.split(search).map(val => {newstr += val + replacement})
+  return newstr.substring(0, newstr.length - replacement.length)
+}
+
 // Main example
 class App extends Component {
 
@@ -121,6 +127,7 @@ class App extends Component {
         query = query.slice(0, 15)
         getDB(data => {
           if (query in data) {
+            query = ReplaceAll(query, 'lll', '.')
             var newLib = parseFromQuery(data[query])
             this.count = newLib.count
             this.setState({
@@ -360,14 +367,13 @@ class App extends Component {
                   htmlToImage.toPng(this.diagramRef).then(function (dataUrl) {
                     var img = new Image();
                     img.src = dataUrl;
-                    console.log(img)
                     var link = document.createElement('a');
                     link.download = 'diagram.png';
                     link.href = dataUrl;
                     link.click();
                   })
                 }}>
-                Export
+                Export PNG
               </Button>
 
             </CardContent>
@@ -491,6 +497,7 @@ class App extends Component {
               style={{background:indigo['A400'], color:'#ffffff', zIndex:6, boxShadow:'none'}}
               onClick={() => {
                 var newQuery = parseToQuery(this.state.theme, this.state.variant, this.state.lineWidth, this.count, this.state.points);
+                newQuery = ReplaceAll(newQuery, '.', 'lll')
                 postToDB(newQuery, (mod_id) => {
                   var newUrl = this.baseUrl + '?p=' + mod_id;
                   copy(newUrl)

@@ -65,16 +65,14 @@ export function parseToQuery(tmp_theme, tmp_variant, lineWidth, count, points) {
       msg = msg.substring(0, msg.length - 1)
     }
   })
-  msg = msg.replace(/ /g, '%s0')
   return msg
 }
 
 
 // Parse query and return state variables
 export function parseFromQuery(rawquery) {
-  var query = rawquery.replace(/%s0/g, ' ')
   var newLib = { points:{} }
-  var queries = query.split(lvls[0])
+  var queries = rawquery.split(lvls[0])
   newLib['theme'] = (queries[0] === 'R' ? null : themes[string2num(queries[0])])
   newLib['variant'] = queries[1]
   newLib['lineWidth'] = string2num(queries[2])
