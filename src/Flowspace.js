@@ -92,6 +92,7 @@ export default class Flowspace extends Component {
               inputLoc: 'auto',
               outputColor: theme_colors.p,
               inputColor: this.props.noFade ? theme_colors.p : theme_colors.a,
+              dash: undefined,
               onClick: null
             });
           });
@@ -108,6 +109,7 @@ export default class Flowspace extends Component {
               inputLoc: output.input || 'auto',
               outputColor: output.outputColor || theme_colors.p,
               inputColor: output.inputColor || (this.props.noFade ? theme_colors.p : theme_colors.a),
+              dash: (output.dash !== undefined ? (output.dash > 0 ? output.dash : undefined) : undefined),
               onClick: output.onClick ? (e) => {output.onClick(child.key, out_key, e)} : this.props.onLineClick ? (e) => {this.props.onLineClick(child.key, out_key, e)} : null
             });
           });
@@ -176,7 +178,10 @@ export default class Flowspace extends Component {
             <path
               key={pathkey}
               className='flowconnection'
-              style={{ transition:'stroke-width 0.15s ease-in-out'}}
+              style={{
+                transition:'stroke-width 0.15s ease-in-out',
+                strokeDasharray:connection.dash
+              }}
               d={'M' + positions.output.x + ',' + positions.output.y +
                 'C' +
                 (positions.output.x + (positions.output.offsetX > 0 ? Math.min(d, positions.output.offsetX) : Math.max(-d, positions.output.offsetX))) + ',' +

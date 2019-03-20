@@ -84,6 +84,8 @@ Used to determine the colors used for the flowpoints. Available themes:
 ### Outputs
 The flowspace extracts information about all connections from the outputs of every flowpoint. Telling a flowpoint about inputs won’t have any effect.
 
+To change the color and stroke of a single connection: Add that info to the output like shown below
+
 There are two ways to pass info about the connections:
 
 __As an array.__\
@@ -100,7 +102,8 @@ Create an object using the following pattern:
     "point_b": {
       output: "auto",
       input: "auto",
-      inputColor: "red"
+      inputColor: "red",
+      dash: 5
     },
     "point_c": {
       output: "right",

@@ -62,6 +62,7 @@ class App extends Component {
       showSettings: true,
       showInfobox: false,
       selected: null,
+      selectedLine: null,
       connecting: null,
       inputColor: '#00fff2',
       outputColor: '#0c00ff',
@@ -91,10 +92,12 @@ class App extends Component {
     this.infoBox = this.infoBox.bind(this)
     this.handleAddPoint = this.handleAddPoint.bind(this)
 
-    // Adding lineClick
-    Object.keys(this.state.points).map(key => {
-      Object.keys(this.state.points[key].outputs).map(out_key => {
-        this.state.points[key].outputs[out_key].onClick = this.handleClickLine
+    // Adding dash
+    Object.keys(this.state.points).map(p_key => {
+      Object.keys(this.state.points[p_key].outputs).map(o_key => {
+        if (!("dash" in this.state.points[p_key].outputs[o_key])) {
+          this.state.points[p_key].outputs[o_key].dash = 0
+        }
       })
     })
   }
@@ -130,6 +133,13 @@ class App extends Component {
             query = ReplaceAll(query, 'lll', '.')
             var newLib = parseFromQuery(data[query])
             this.count = newLib.count
+            Object.keys(newLib.points).map(p_key => {
+              Object.keys(newLib.points[p_key].outputs).map(o_key => {
+                if (!("dash" in newLib.points[p_key].outputs[o_key])) {
+                  newLib.points[p_key].outputs[o_key].dash = 0
+                }
+              })
+            })
             this.setState({
               theme: (newLib.theme === null ? opts[Math.round(Math.random() * opts.length)] : newLib.theme),
               variant: newLib.variant,
@@ -188,7 +198,7 @@ class App extends Component {
             p1.outputs[id] = {
               output:'auto',
               input:'auto',
-              onClick:this.handleClickLine
+              dash: 10
             }
           }
         }
@@ -215,7 +225,7 @@ class App extends Component {
           p1.outputs[id] = {
             output:'auto',
             input:'auto',
-            onClick:this.handleClickLine
+            dash: 10
           }
         }
       }
@@ -423,6 +433,39 @@ class App extends Component {
             </Card> : null
         }
 
+        {
+          this.state.selectedLine
+          ? <Card style={{marginTop:10}}>
+            <CardContent style={{paddingTop:0, paddingBottom:15}}>
+
+              <form onSubmit={(e) => {e.preventDefault()}}>
+                <TextField
+                  label="Dash length"
+                  type="number"
+                  autoComplete="off"
+                  value={this.state.points[this.state.selectedLine.a].outputs[this.state.selectedLine.b].dash}
+                  onChange={(e) => {
+                    var points = this.state.points
+                    var newVal = e.target.value
+                    if (newVal > 0) {
+                      newVal = Math.round(newVal)
+                    } else {
+                      newVal = null
+                    }
+                    points[this.state.selectedLine.a].outputs[this.state.selectedLine.b].dash = newVal
+                    this.setState({points: points})
+                  }}
+                  InputLabelProps={{
+                    shrink: true,
+                  }}
+                  style={{width:'100%'}}
+                    margin="normal"/>
+              </form>
+
+            </CardContent>
+          </Card> : null
+        }
+
       </div>
     )
   }
@@ -442,7 +485,9 @@ class App extends Component {
             style={{height:'100vh', width:'100vw'}}
             connectionSize={this.state.lineWidth}
             selected={this.state.selected}
-            onClick={e => {this.setState({ selected:null, selectedLine:null })}}>
+            selectedLine={this.state.selectedLine}
+            onClick={e => {this.setState({ selected:null, selectedLine:null })}}
+            onLineClick={(key_a, key_b) => {this.setState({ selectedLine:{a:key_a, b:key_b} })}}>
 
             {
               Object.keys(this.state.points).map(key => {
