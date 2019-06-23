@@ -3,7 +3,15 @@ import ReactDOM from "react-dom";
 import './index.css';
 
 import { postToDB, getDB } from './DBhandler.js';
-import { num2string, string2num, themes, darktheme, parseToQuery, parseFromQuery } from './Helpers.js';
+import {
+  themes,
+  darktheme,
+  parseFromQuery,
+  PasswordContainer,
+  ReplaceAll,
+  Encrypt,
+  Decrypt
+} from './Helpers.js';
 
 import copy from 'copy-to-clipboard';
 
@@ -15,7 +23,7 @@ import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardContent from '@material-ui/core/CardContent';
-import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+import { MuiThemeProvider } from '@material-ui/core/styles';
 import Typography from '@material-ui/core/Typography';
 import Snackbar from '@material-ui/core/Snackbar';
 import SnackbarContent from '@material-ui/core/SnackbarContent';
@@ -35,23 +43,9 @@ import lightBlue from '@material-ui/core/colors/lightBlue';
 
 import { Flowspace, Flowpoint } from '../../src';
 
-var myImg = require('../../assets/favicon.ico');
-var myImg = require('../../assets/this_is_flowpoints.png');
-var myImg = require('../../assets/filled.png');
-var myImg = require('../../assets/outlined.png');
-var myImg = require('../../assets/paper.png');
-var myImg = require('../../assets/sample_1.png');
-var myImg = require('../../assets/sample_2.png');
-var myImg = require('../../assets/sample_3.png');
 
 var htmlToImage = require('html-to-image');
 
-
-function ReplaceAll(str, search, replacement) {
-  var newstr = ''
-  str.split(search).map(val => {newstr += val + replacement})
-  return newstr.substring(0, newstr.length - replacement.length)
-}
 
 // Main example
 class App extends Component {
@@ -70,12 +64,14 @@ class App extends Component {
       points: {},
       theme: 'indigo',
       variant: 'outlined',
-      background: 'black',
+      background: 'white',
       lastPos: {x:300, y:50},
       snackShow: false,
       snackMsg: '',
       snackColor: blue[500],
-      doFocus: false
+      doFocus: false,
+      testmsg: 'thisisatesttoverifydecryption',
+      showSaveBox: false
     }
 
     // Helper variables
@@ -91,6 +87,8 @@ class App extends Component {
     this.settingsBox = this.settingsBox.bind(this)
     this.infoBox = this.infoBox.bind(this)
     this.handleAddPoint = this.handleAddPoint.bind(this)
+    this.saveBox = this.saveBox.bind(this);
+    this.loadBox = this.loadBox.bind(this);
 
     // Adding dash
     Object.keys(this.state.points).map(p_key => {
@@ -104,6 +102,9 @@ class App extends Component {
 
 
   componentDidMount() {
+    //window.onbeforeunload = () => {
+    //  if (this.count > 0) return 'Any unsaved data will be lost';
+    //}
     const opts = [
       'red',
       'pink',,
@@ -120,35 +121,55 @@ class App extends Component {
       'orange',
       'deep-orange',
     ]
-    this.setState({
+    /*this.setState({
       theme:opts[Math.round(Math.random() * opts.length)],
       variant:(Math.random() < 0.5 ? 'outlined' : 'filled')
-    })
+    })*/
     var query = window.location.href.split(this.baseUrl)[1].substring(3)
     if (query) {
       try {
         query = query.slice(0, 15)
         getDB(data => {
           if (query in data) {
-            query = ReplaceAll(query, 'lll', '.')
-            var newLib = parseFromQuery(data[query])
-            this.count = newLib.count
-            Object.keys(newLib.points).map(p_key => {
-              Object.keys(newLib.points[p_key].outputs).map(o_key => {
-                if (!("dash" in newLib.points[p_key].outputs[o_key])) {
-                  newLib.points[p_key].outputs[o_key].dash = 0
-                }
+            // Choosing parser and parsing
+            if (data[query].substring(0, 6) === 'prsr02') {
+              // Encrypted using default password
+              var decrypted = Decrypt(data[query].substring(6), 'Hello world!');
+              this.count = Object.keys(decrypted.points).length + 1;
+              this.setState(decrypted)
+              this.setState({
+                snackShow: true,
+                snackMsg: 'Loaded model from URL',
+                snackcolor: green['A700']
               })
-            })
-            this.setState({
-              theme: (newLib.theme === null ? opts[Math.round(Math.random() * opts.length)] : newLib.theme),
-              variant: newLib.variant,
-              lineWidth: newLib.lineWidth,
-              points: newLib.points,
-              snackShow: true,
-              snackMsg: 'Loaded model from URL',
-              snackcolor: green['A700']
-            })
+            } else if (data[query].substring(0, 6) === 'prsr03') {
+              // Encrypted using user defined password
+              this.setState({
+                showLoadBox: true,
+                encryptedQuery: data[query].substring(6)
+              })
+            } else {
+              // Legacy parser
+              query = ReplaceAll(query, 'lll', '.')
+              var newLib = parseFromQuery(data[query])
+              this.count = newLib.count
+              Object.keys(newLib.points).map(p_key => {
+                Object.keys(newLib.points[p_key].outputs).map(o_key => {
+                  if (!("dash" in newLib.points[p_key].outputs[o_key])) {
+                    newLib.points[p_key].outputs[o_key].dash = 0
+                  }
+                })
+              })
+              this.setState({
+                theme: (newLib.theme === null ? opts[Math.round(Math.random() * opts.length)] : newLib.theme),
+                variant: newLib.variant,
+                lineWidth: newLib.lineWidth,
+                points: newLib.points,
+                snackShow: true,
+                snackMsg: 'Loaded model from URL',
+                snackcolor: green['A700']
+              })
+            }
           } else {
             this.setState({
               snackShow: true,
@@ -198,7 +219,7 @@ class App extends Component {
             p1.outputs[id] = {
               output:'auto',
               input:'auto',
-              dash: 10
+              dash: 0
             }
           }
         }
@@ -210,7 +231,7 @@ class App extends Component {
   }
 
 
-  handleTouch(id, e) {
+  handleTouch(id) {
     this.doFocus = false;
     var selected = this.state.selected
     var points = this.state.points
@@ -225,7 +246,7 @@ class App extends Component {
           p1.outputs[id] = {
             output:'auto',
             input:'auto',
-            dash: 10
+            dash: 0
           }
         }
       }
@@ -373,7 +394,7 @@ class App extends Component {
 
               <Button
                 variant="outlined"
-                onClick={(e) => {
+                onClick={() => {
                   htmlToImage.toPng(this.diagramRef).then(function (dataUrl) {
                     var img = new Image();
                     img.src = dataUrl;
@@ -395,7 +416,10 @@ class App extends Component {
             ? <Card style={{marginTop:10}}>
               <CardContent style={{paddingTop:0, paddingBottom:15}}>
 
-                <form onSubmit={(e) => {e.preventDefault()}}>
+                <form onSubmit={(e) => {
+                  e.preventDefault()
+                  this.handleAddPoint()
+                  }}>
                   <TextField
                     id="msgfield"
                     label="Message"
@@ -417,7 +441,7 @@ class App extends Component {
 
                 <Button
                   variant="outlined"
-                  onClick={(e) => {
+                  onClick={() => {
                     var selected = this.state.selected;
                     var points = {}
                     Object.keys(this.state.points).map(testkey => {
@@ -471,6 +495,126 @@ class App extends Component {
   }
 
 
+  saveBox() {
+    return (
+      <div style={{position:'fixed', top:0, left:260, width:250, paddingLeft:10, opacity:0.9}}>
+        <Card style={{marginTop:10}}>
+          <CardContent>
+
+            <Typography gutterBottom variant="h5" component="h2" style={{opacity:1}}>
+              Password (optional)
+            </Typography>
+
+            <Typography component="p">
+              Hit enter to skip.
+              <br/>
+              <br/>
+              Create a password to encrypt your document, or leave this field blank to get a publicly available link.
+              <br/>
+              <br/>
+              Note that if you forget this key the document cannot be recovered.
+              <br/>
+            </Typography>
+
+            <div style={{paddingBottom:10}}>
+              <PasswordContainer
+                onSubmit={pswd => {
+                  var toencrypt = this.state;
+                  toencrypt['showSaveBox'] = false;
+                  toencrypt['showLoadBox'] = false;
+                  var newQuery = 'prsr'
+                  if (pswd === '') {
+                    newQuery += '02' + Encrypt(toencrypt, 'Hello world!')
+                  } else {
+                    newQuery += '03' + Encrypt(toencrypt, pswd)
+                  }
+                  postToDB(newQuery, (mod_id) => {
+                    var newUrl = this.baseUrl + '?p=' + mod_id;
+                    copy(newUrl)
+                    this.setState({
+                      snackShow: true,
+                      snackMsg: 'Copied link to clipboard',
+                      snackcolor: indigo['A400']
+                    })
+                    window.history.pushState({}, mod_id, newUrl);
+                  })
+                }}/>
+            </div>
+
+            <Button
+              variant="outlined"
+              onClick={() => {
+                this.setState({showSaveBox: false})
+              }}>
+              Cancel
+            </Button>
+
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+
+
+  loadBox() {
+    return (
+      <div style={{position:'fixed', top:0, left:260, width:250, paddingLeft:10, opacity:0.9}}>
+        <Card style={{marginTop:10}}>
+          <CardContent>
+
+            <Typography gutterBottom variant="h5" component="h2" style={{opacity:1}}>
+              Password
+            </Typography>
+
+            <Typography component="p">
+              The document is encrypted.
+              <br/>
+              <br/>
+              Please type your key in order to decrypt it.
+              <br/>
+            </Typography>
+
+            <div style={{paddingBottom:10}}>
+              <PasswordContainer
+                onSubmit={pswd => {
+                  var decrypted = Decrypt(this.state.encryptedQuery, pswd);
+                  if (decrypted.testmsg) {
+                    if (decrypted.testmsg === 'thisisatesttoverifydecryption') {
+                      this.count = Object.keys(decrypted.points).length + 1;
+                      this.setState(decrypted)
+                      this.setState({
+                        snackShow: true,
+                        showLoadBox: false,
+                        snackMsg: 'Loaded model from URL',
+                        snackcolor: green['A700']
+                      })
+                      return
+                    }
+                  }
+                  this.setState({
+                    snackShow: true,
+                    snackMsg: 'Failed to decrypt data',
+                    snackcolor: orange['A400']
+                  })
+                }}/>
+            </div>
+
+            <Button
+              variant="outlined"
+              onClick={() => {
+                this.setState({showLoadBox: false})
+              }}>
+              Cancel
+            </Button>
+
+          </CardContent>
+        </Card>
+      </div>
+    )
+  }
+
+
   render() {
     return (
       <MuiThemeProvider theme={darktheme}>
@@ -486,7 +630,7 @@ class App extends Component {
             connectionSize={this.state.lineWidth}
             selected={this.state.selected}
             selectedLine={this.state.selectedLine}
-            onClick={e => {this.setState({ selected:null, selectedLine:null })}}
+            onClick={() => {this.setState({ selected:null, selectedLine:null })}}
             onLineClick={(key_a, key_b) => {this.setState({ selectedLine:{a:key_a, b:key_b} })}}>
 
             {
@@ -502,7 +646,7 @@ class App extends Component {
                     startPosition={point.pos}
                     outputs={point.outputs}
                     onClick={e => {this.handleClick(key, e)}}
-                    onTouch={e => {this.handleTouch(key, e)}}
+                    onTouch={e => {this.handleTouch(key)}}
                     onDrag={pos => {
                       var points = this.state.points;
                       points[key].pos = pos;
@@ -511,7 +655,7 @@ class App extends Component {
                     <div style={{display:'table', width:'100%', height:'100%'}}>
                       <div style={{display:'table-cell', verticalAlign:'middle', textAlign:'center', paddingLeft:2, paddingRight:2}}>
                         {
-                          point.msg !== '' ? point.msg : 'empty'
+                          point.msg !== '' ? point.msg : 'Empty'
                         }
                       </div>
                     </div>
@@ -541,17 +685,9 @@ class App extends Component {
             <Fab
               style={{background:indigo['A400'], color:'#ffffff', zIndex:6, boxShadow:'none'}}
               onClick={() => {
-                var newQuery = parseToQuery(this.state.theme, this.state.variant, this.state.lineWidth, this.count, this.state.points);
-                newQuery = ReplaceAll(newQuery, '.', 'lll')
-                postToDB(newQuery, (mod_id) => {
-                  var newUrl = this.baseUrl + '?p=' + mod_id;
-                  copy(newUrl)
-                  this.setState({
-                    snackShow: true,
-                    snackMsg: 'Copied link to clipboard',
-                    snackcolor: indigo['A400']
-                  })
-                })
+                //var newQuery = parseToQuery(this.state.theme, this.state.variant, this.state.lineWidth, this.count, this.state.points);
+                //newQuery = ReplaceAll(newQuery, '.', 'lll')
+                this.setState({showSaveBox: true, password: ''})
               }}>
               <LinkIcon />
             </Fab>
@@ -581,6 +717,14 @@ class App extends Component {
             message={this.state.snackMsg}
             style={{backgroundColor:this.state.snackcolor, color:'black'}}/>
         </Snackbar>
+
+        {
+          this.state.showSaveBox ? this.saveBox() : null
+        }
+
+        {
+          this.state.showLoadBox ? this.loadBox() : null
+        }
 
       </MuiThemeProvider>
     );

@@ -96,10 +96,12 @@ export default class Flowpoint extends Component {
     // Adding/removing event listeners
     if (this.state.drag && !state.drag) {
       document.addEventListener('mousemove', this.onMouseMove)
-      document.addEventListener('mouseup', this.onMouseUp)
+      document.addEventListener('touchmove', this.onTouchMove)
+      document.addEventListener('touchend', this.onTouchEnd)
     } else if (!this.state.drag && state.drag) {
       document.removeEventListener('mousemove', this.onMouseMove)
-      document.removeEventListener('mouseup', this.onMouseUp)
+      document.removeEventListener('touchmove', this.onTouchMove)
+      document.removeEventListener('touchend', this.onTouchEnd)
     }
 
   }
@@ -344,12 +346,8 @@ export default class Flowpoint extends Component {
         onMouseOver   = {this.onMouseOver}
         onMouseOut    = {this.onMouseOut}
         onMouseDown   = {(e) => {this.onMouseDown(e)}}
-        onMouseUp     = {(e) => {this.onMouseUp(e)}}
-        onMouseMove   = {(e) => {this.onMouseMove(e)}}
         onTouchStart  = {(e) => {this.onTouchStart(e)}}
-        onTouchEnd    = {(e) => {this.onTouchEnd(e)}}
-        onTouchCancel = {(e) => {this.onTouchEnd(e)}}
-        onTouchMove   = {(e) => {this.onTouchMove(e)}}>
+        onClick       = {(e) => {this.onMouseUp(e);console.log('fisk', e)}}>
         {
           this.props.children
         }

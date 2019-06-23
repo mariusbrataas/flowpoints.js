@@ -1,4 +1,11 @@
+import React, { Component } from "react";
+import ReactDOM from "react-dom";
+
 import { MuiThemeProvider, createMuiTheme } from '@material-ui/core/styles';
+
+import TextField from '@material-ui/core/TextField';
+
+var CryptoJS = require("crypto-js");
 
 export function num2string(num) {
   return num.toString(36)
@@ -103,4 +110,80 @@ export function parseFromQuery(rawquery) {
     newLib.points['' + q[0]] = p
   })
   return newLib
+}
+
+export function ReplaceAll(str, search, replacement) {
+  var newstr = ''
+  str.split(search).map(val => {newstr += val + replacement})
+  return newstr.substring(0, newstr.length - replacement.length)
+}
+
+export function getSpecialsLib(reversed) {
+  var lib = {
+    '§': '%C2%A7',
+    '"': '%22',
+    '#': '%23',
+    '%': '%25',
+    '&': '%26',
+    '=': '%3D',
+    '`': '%60',
+    '^': '%5E',
+    '+': '%2B',
+    '´': '%C2%B4',
+    '¨': '%C2%A8'
+  }
+  if (reversed) {
+    var revlib = {}
+    Object.keys(lib).map(key => {
+      revlib[lib[key]] = key
+    })
+    return revlib
+  }
+  return lib
+}
+
+export function Encrypt(data, key) {
+  var encrypted = CryptoJS.AES.encrypt(JSON.stringify(data), key).toString()
+  const specials = getSpecialsLib()
+  Object.keys(specials).map(key => {
+    encrypted = ReplaceAll(encrypted, key, specials[key])
+  })
+  return encrypted
+}
+
+export function Decrypt(data, key) {
+  var msg = data
+  const specials = getSpecialsLib(true)
+  Object.keys(specials).map(key => {
+    msg = ReplaceAll(msg, key, specials[key])
+  })
+  return JSON.parse(CryptoJS.AES.decrypt(msg, key).toString(CryptoJS.enc.Utf8))
+}
+
+
+export class PasswordContainer extends Component {
+  constructor(props) {
+    super(props);
+    this.state = {
+      pswd: ''
+    }
+  }
+  render() {
+    return (
+      <form autoComplete='off' onSubmit={(e) => {e.preventDefault(); if (this.props.onSubmit) {this.props.onSubmit(this.state.pswd)}}}>
+        <TextField
+          id="pswdfield"
+          label="Password"
+          value={this.state.pswd}
+          onChange={(e) => {this.setState({pswd:e.target.value})}}
+          type="text"
+          InputLabelProps={{
+            shrink: true,
+          }}
+          style={{width:'100%'}}
+          margin="normal"
+          inputRef={(input) => {if (input) {input.focus()}}}/>
+      </form>
+    )
+  }
 }
