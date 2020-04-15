@@ -254,7 +254,7 @@ ReactDOM.render(<App />, document.getElementById('root'))
 
 Of course, you can do with much less code than this, but this example should give a good indication on how you can structure your data for a flowchart.
 
-Check out the [demo](https://mariusbrataas.github.io/flowpoints.js/?p=demo) and it's [source code](https://github.com/mariusbrataas/flowpoints/tree/master/demo/src) for more.
+Check out the [demo](https://mariusbrataas.github.io/flowpoints.js/?p=demo) and it's [source code](https://github.com/mariusbrataas/flowpoints.js/tree/master/demo/src) for more.
 
 ## Contributing
 
@@ -304,4 +304,4 @@ flowpoints
 ```
 
 ## License
-[MIT](https://github.com/mariusbrataas/flowpoints/blob/master/LICENSE)
+[MIT](https://github.com/mariusbrataas/flowpoints.js/blob/master/LICENSE)
