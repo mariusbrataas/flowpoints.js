@@ -192,7 +192,9 @@ export default class Flowspace extends Component {
               fill="none"
               stroke={'url(#' + grad_name + ')'}
               strokeWidth={parseInt(connection.width) + (isSelectedLine ? 3 : 0)}
-              onClick={connection.onClick}/>
+              onClick={connection.onClick}
+              marker-start={this.props.arrowStart ? 'url(#arrow)' : null}
+              marker-end={this.props.arrowEnd ? 'url(#arrow)' : null}/>
           )
 
           // Calculating how x and y should affect gradient
@@ -250,6 +252,11 @@ export default class Flowspace extends Component {
           <div ref={ref => {if (this.props.getDiagramRef) this.props.getDiagramRef(ref)}} style={{width:'100%', height:'100%', backgroundColor:background_color.p}}>
 
             <svg style={{width:'100%', height:'100%', position:'absolute', overflow:'visible'}} className='flowconnections'>
+              <def>
+                <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
+                  <path d="M 0 0 L 10 5 L 0 10 z" />
+                </marker>
+              </def>
               {
                 gradients
               }

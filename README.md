@@ -160,6 +160,8 @@ Possible locations: top, left, center (default), right, bottom.
   background="white"
   style={{ width:'100vw', height:'100vh' }}
   connectionSize=4
+  arrowStart={false}
+  arrowEnd={true}
   selected="point_a"
   selectedLine={{ a:"point_a", b:"point_b" }}
   onLineClick={(key_a, key_b, e) => {
