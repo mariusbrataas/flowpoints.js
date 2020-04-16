@@ -109,6 +109,8 @@ export default class Flowspace extends Component {
               inputLoc: output.input || 'auto',
               outputColor: output.outputColor || theme_colors.p,
               inputColor: output.inputColor || (this.props.noFade ? theme_colors.p : theme_colors.a),
+              arrowStart: output.arrowStart,
+              arrowEnd: output.arrowStart,
               dash: (output.dash !== undefined ? (output.dash > 0 ? output.dash : undefined) : undefined),
               onClick: output.onClick ? (e) => {output.onClick(child.key, out_key, e)} : this.props.onLineClick ? (e) => {this.props.onLineClick(child.key, out_key, e)} : null
             });
@@ -167,6 +169,12 @@ export default class Flowspace extends Component {
           // Calculate new positions or get old ones
           var positions = AutoGetLoc(pa, pb, connection.outputLoc, connection.inputLoc, connection.a, connection.b, this.state, (this.props.avoidCollisions === false ? false : true));
 
+          // Display arrows - if set then connection-specific overrides flowspace
+          const markerStart = this.props.arrowStart;
+          if (connection.arrowStart !== undefined) markerStart = connection.arrowStart;
+          const markerEnd = this.props.arrowEnd;
+          if (connection.arrowEnd !== undefined) markerEnd = connection.arrowEnd;
+
           // Calculating bezier offsets and adding new path to list
           const d = Math.round(Math.pow(Math.pow(positions.output.x - positions.input.x, 2) + Math.pow(positions.output.y - positions.input.y, 2), 0.5) / 2)
           const pathkey = 'path_' + connection.a + '_' + connection.b
@@ -193,8 +201,9 @@ export default class Flowspace extends Component {
               stroke={'url(#' + grad_name + ')'}
               strokeWidth={parseInt(connection.width) + (isSelectedLine ? 3 : 0)}
               onClick={connection.onClick}
-              marker-start={this.props.arrowStart ? 'url(#arrow)' : null}
-              marker-end={this.props.arrowEnd ? 'url(#arrow)' : null}/>
+              marker-start={markerStart ? 'url(#arrow)' : null}
+              marker-end={markerEnd ? 'url(#arrow)' : null}
+              />
           )
 
           // Calculating how x and y should affect gradient

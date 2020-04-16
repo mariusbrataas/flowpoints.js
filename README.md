@@ -130,6 +130,8 @@ Possible locations: top, left, center (default), right, bottom.
       input:"left",
       outputColor:"#0c00ff",
       inputColor:"#ff0022",
+      markerStart: false,
+      markerEnd: true
       onClick: (key_a, key_b, e) => {
         console.log('Click connection ' + key_a + ' -> ' + key_b)
       }
@@ -171,7 +173,7 @@ Possible locations: top, left, center (default), right, bottom.
   > ... </Flowspace>
 ```
 
-Themes, variants and connectionSizes passed to the flowspace will be the default values used when drawing connections. A different value specified by a flowpoint's outputs will replace the default value for that connection only.
+Themes, variants, connectionSizes, arrowStart and arrowEnd settings passed to the flowspace will be the default values used when drawing connections. A different value specified by a flowpoint's outputs will replace the default value for that connection only.
 
 ## Suggested pattern
 
