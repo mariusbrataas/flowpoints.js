@@ -37,6 +37,13 @@ export const themes = [
   'white'
 ]
 
+export const arrows = [
+  'none',
+  'start',
+  'end',
+  'both'
+]
+
 export const darktheme = createMuiTheme({
   palette: {
     type: 'dark',
