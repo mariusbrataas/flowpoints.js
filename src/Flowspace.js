@@ -170,9 +170,9 @@ export default class Flowspace extends Component {
           var positions = AutoGetLoc(pa, pb, connection.outputLoc, connection.inputLoc, connection.a, connection.b, this.state, (this.props.avoidCollisions === false ? false : true));
 
           // Display arrows - if set then connection-specific overrides flowspace
-          const markerStart = this.props.arrowStart;
+          var markerStart = this.props.arrowStart;
           if (connection.arrowStart !== undefined) markerStart = connection.arrowStart;
-          const markerEnd = this.props.arrowEnd;
+          var markerEnd = this.props.arrowEnd;
           if (connection.arrowEnd !== undefined) markerEnd = connection.arrowEnd;
 
           // Calculating bezier offsets and adding new path to list
@@ -201,8 +201,8 @@ export default class Flowspace extends Component {
               stroke={'url(#' + grad_name + ')'}
               strokeWidth={parseInt(connection.width) + (isSelectedLine ? 3 : 0)}
               onClick={connection.onClick}
-              marker-start={markerStart ? 'url(#arrow)' : null}
-              marker-end={markerEnd ? 'url(#arrow)' : null}
+              markerStart={markerStart ? 'url(#arrow)' : null}
+              markerEnd={markerEnd ? 'url(#arrow)' : null}
               />
           )
 
@@ -262,8 +262,8 @@ export default class Flowspace extends Component {
 
             <svg style={{width:'100%', height:'100%', position:'absolute', overflow:'visible'}} className='flowconnections'>
               <def>
-                <marker id="arrow" viewBox="0 0 10 10" refX="5" refY="5" markerWidth="6" markerHeight="6" orient="auto">
-                  <path d="M 0 0 L 10 5 L 0 10 z" />
+                <marker id="arrow" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="auto" >
+                  <path d="M0,0 L0,6 L9,3 z" />
                 </marker>
               </def>
               {
