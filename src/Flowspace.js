@@ -69,6 +69,7 @@ export default class Flowspace extends Component {
     var connections = [];
     var paths = [];
     var gradients = [];
+    var defs = {};
     var maxX = 0;
     var maxY = 0;
 
@@ -175,6 +176,16 @@ export default class Flowspace extends Component {
           var markerEnd = this.props.arrowEnd;
           if (connection.arrowEnd !== undefined) markerEnd = connection.arrowEnd;
 
+          // Adding coloured arrow-marker definitions to list (if not already present)
+          if (markerStart && !defs[connection.outputColor]) defs[connection.outputColor] = 
+            <marker id={"arrow" + connection.outputColor} viewBox="0 0 50 50" markerWidth="5" markerHeight="5" refX="45" refY="24" orient="auto-start-reverse" markerUnits="strokeWidth">
+              <path d="M0,0 L50,20 v8 L0,48 L6,24 Z" fill={connection.outputColor} stroke-width='0' opacity='1' />
+            </marker>
+          if (markerEnd && !defs[connection.inputColor]) defs[connection.inputColor] = 
+            <marker id={"arrow" + connection.inputColor} viewBox="0 0 50 50" markerWidth="5" markerHeight="5" refX="45" refY="24" orient="auto-start-reverse" markerUnits="strokeWidth">
+              <path d="M0,0 L50,20 v8 L0,48 L6,24 Z" fill={connection.inputColor} stroke-width='0' opacity='1' />
+            </marker>
+
           // Calculating bezier offsets and adding new path to list
           const d = Math.round(Math.pow(Math.pow(positions.output.x - positions.input.x, 2) + Math.pow(positions.output.y - positions.input.y, 2), 0.5) / 2)
           const pathkey = 'path_' + connection.a + '_' + connection.b
@@ -201,8 +212,8 @@ export default class Flowspace extends Component {
               stroke={'url(#' + grad_name + ')'}
               strokeWidth={parseInt(connection.width) + (isSelectedLine ? 3 : 0)}
               onClick={connection.onClick}
-              markerStart={markerStart ? 'url(#arrow)' : null}
-              markerEnd={markerEnd ? 'url(#arrow)' : null}
+              markerStart={markerStart ? 'url(#arrow' + connection.outputColor + ')' : null}
+              markerEnd={markerEnd ? 'url(#arrow' + connection.inputColor + ')' : null}
               />
           )
 
@@ -261,11 +272,9 @@ export default class Flowspace extends Component {
           <div ref={ref => {if (this.props.getDiagramRef) this.props.getDiagramRef(ref)}} style={{width:'100%', height:'100%', backgroundColor:background_color.p}}>
 
             <svg style={{width:'100%', height:'100%', position:'absolute', overflow:'visible'}} className='flowconnections'>
-              <def>
-                <marker id="arrow" markerWidth="10" markerHeight="10" refX="0" refY="3" orient="auto" >
-                  <path d="M0,0 L0,6 L9,3 z" />
-                </marker>
-              </def>
+              <defs>
+                  {Object.values(defs)}
+              </defs>
               {
                 gradients
               }
