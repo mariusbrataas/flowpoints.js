@@ -6,6 +6,7 @@ import { postToDB, getDB } from './DBhandler.js';
 import {
   themes,
   darktheme,
+  arrows,
   parseFromQuery,
   PasswordContainer,
   ReplaceAll,
@@ -65,6 +66,7 @@ class App extends Component {
       theme: 'indigo',
       variant: 'outlined',
       background: 'white',
+      arrow: 'none',
       lastPos: {x:300, y:50},
       snackShow: false,
       snackMsg: '',
@@ -358,6 +360,26 @@ class App extends Component {
                 </FormControl>
               </div>
 
+              <div style={{paddingBottom:10}}>
+                <FormControl style={{width:'100%'}}>
+                  <InputLabel htmlFor='arrowselect'>Arrows</InputLabel>
+                  <Select
+                    value={this.state.arrow}
+                    inputProps={{ name:'arrow select', id:'arrowselect'}}
+                    onChange={(e) => {
+                      this.setState({arrow:e.target.value})
+                    }}>
+                    {
+                      arrows.map(arrowname => {
+                        return (
+                          <MenuItem value={arrowname}>{arrowname}</MenuItem>
+                        )
+                      })
+                    }
+                  </Select>
+                </FormControl>
+              </div>
+
               <div>
                 <FormControl style={{width:'100%'}}>
                   <InputLabel htmlFor='variantselect'>Variant</InputLabel>
@@ -624,6 +646,8 @@ class App extends Component {
             theme={this.state.theme}
             variant={this.state.variant}
             background={this.state.background}
+            arrowStart={this.state.arrow === 'start' || this.state.arrow === 'both'}
+            arrowEnd={this.state.arrow === 'end' || this.state.arrow === 'both'}
             getDiagramRef={ref => {this.diagramRef = ref}}
             avoidCollisions
             style={{height:'100vh', width:'100vw'}}

@@ -130,6 +130,8 @@ Possible locations: top, left, center (default), right, bottom.
       input:"left",
       outputColor:"#0c00ff",
       inputColor:"#ff0022",
+      markerStart: false,
+      markerEnd: true
       onClick: (key_a, key_b, e) => {
         console.log('Click connection ' + key_a + ' -> ' + key_b)
       }
@@ -160,6 +162,8 @@ Possible locations: top, left, center (default), right, bottom.
   background="white"
   style={{ width:'100vw', height:'100vh' }}
   connectionSize=4
+  arrowStart={false}
+  arrowEnd={true}
   selected="point_a"
   selectedLine={{ a:"point_a", b:"point_b" }}
   onLineClick={(key_a, key_b, e) => {
@@ -169,7 +173,7 @@ Possible locations: top, left, center (default), right, bottom.
   > ... </Flowspace>
 ```
 
-Themes, variants and connectionSizes passed to the flowspace will be the default values used when drawing connections. A different value specified by a flowpoint's outputs will replace the default value for that connection only.
+Themes, variants, connectionSizes, arrowStart and arrowEnd settings passed to the flowspace will be the default values used when drawing connections. A different value specified by a flowpoint's outputs will replace the default value for that connection only.
 
 ## Suggested pattern
 
@@ -254,7 +258,7 @@ ReactDOM.render(<App />, document.getElementById('root'))
 
 Of course, you can do with much less code than this, but this example should give a good indication on how you can structure your data for a flowchart.
 
-Check out the [demo](https://mariusbrataas.github.io/flowpoints.js/?p=demo) and it's [source code](https://github.com/mariusbrataas/flowpoints/tree/master/demo/src) for more.
+Check out the [demo](https://mariusbrataas.github.io/flowpoints.js/?p=demo) and it's [source code](https://github.com/mariusbrataas/flowpoints.js/tree/master/demo/src) for more.
 
 ## Contributing
 
@@ -304,4 +308,4 @@ flowpoints
 ```
 
 ## License
-[MIT](https://github.com/mariusbrataas/flowpoints/blob/master/LICENSE)
+[MIT](https://github.com/mariusbrataas/flowpoints.js/blob/master/LICENSE)
