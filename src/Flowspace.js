@@ -111,7 +111,7 @@ export default class Flowspace extends Component {
               outputColor: output.outputColor || theme_colors.p,
               inputColor: output.inputColor || (this.props.noFade ? theme_colors.p : theme_colors.a),
               arrowStart: output.arrowStart,
-              arrowEnd: output.arrowStart,
+              arrowEnd: output.arrowEnd,
               dash: (output.dash !== undefined ? (output.dash > 0 ? output.dash : undefined) : undefined),
               onClick: output.onClick ? (e) => {output.onClick(child.key, out_key, e)} : this.props.onLineClick ? (e) => {this.props.onLineClick(child.key, out_key, e)} : null
             });
