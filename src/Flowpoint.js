@@ -347,7 +347,7 @@ export default class Flowpoint extends Component {
         onMouseOut    = {this.onMouseOut}
         onMouseDown   = {(e) => {this.onMouseDown(e)}}
         onTouchStart  = {(e) => {this.onTouchStart(e)}}
-        onClick       = {(e) => {this.onMouseUp(e);console.log('fisk', e)}}>
+        onClick       = {(e) => {this.onMouseUp(e)}}>
         {
           this.props.children
         }

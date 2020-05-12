@@ -1,6 +1,6 @@
 {
   "name": "flowpoints",
-  "version": "1.0.15",
+  "version": "1.0.16",
   "description": "A developer-friendly library for creating flowcharts and diagrams.",
   "main": "dist/index.js",
   "scripts": {
