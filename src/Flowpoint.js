@@ -82,6 +82,14 @@ export default class Flowpoint extends Component {
         }
       }
     })
+
+    // When a Flowpoint component is used inside a functional 
+    // component, the onClick handler that was passed in is
+    // likely to have captured state inside the resulting closure. 
+    // This becomes a problem when useState hook gets involved.
+    if ('onClick' in props && props.onClick !== this.onClick) {
+      this.onClick = props.onClick;
+    }
   }
 
 
